@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>Offerte erstellen – Allegra Auto GmbH</title>
+<style>
+:root{
+  --bordeaux:#6B1F2E;
+  --ink:#2B2B2B;
+  --muted:#5F5F5F;
+  --hair:#C9C4BE;
+  --field:#F2F0ED;
+  --desk:#E4E0DB;
+  --paper:#FFFFFF;
+  color-scheme:light only;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--desk);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%;overflow-x:hidden}
+
+/* ---------- App-Rahmen ---------- */
+.app{display:flex;align-items:flex-start;min-height:100vh}
+.panel{flex:0 0 380px;background:var(--paper);border-right:1px solid var(--hair);
+  padding:22px 22px 120px;min-height:100vh}
+.stage{flex:1;min-width:0;padding:26px}
+
+.brandbar strong{font-size:15px;font-weight:700;color:var(--bordeaux);letter-spacing:.14em}
+.panel .sub{font-size:12px;color:var(--muted);margin:6px 0 20px}
+
+fieldset{border:0;border-top:1.5px solid var(--bordeaux);margin:0 0 18px;padding:9px 0 0}
+legend{font-size:11px;font-weight:700;color:var(--bordeaux);letter-spacing:.13em;text-transform:uppercase;padding:0 6px 0 0}
+.row{display:flex;align-items:stretch;border-bottom:1px solid var(--hair)}
+.row label{flex:0 0 128px;background:var(--field);color:var(--muted);font-size:11px;
+  display:flex;align-items:center;padding:9px 10px;line-height:1.25}
+.row input,.row select{flex:1;min-width:0;width:100%;border:0;background:transparent;padding:9px 10px;
+  font:inherit;font-size:16px;color:var(--ink);border-radius:0}
+.row input:focus,.row select:focus{outline:2px solid var(--bordeaux);outline-offset:-2px}
+.row select{appearance:none;-webkit-appearance:none}
+.pair{display:flex}
+.pair .row{flex:1;min-width:0}
+.pair .row label{flex:0 0 92px}
+
+.check{display:flex;align-items:center;gap:9px;padding:12px 2px;font-size:13px;color:var(--muted)}
+.check input{width:18px;height:18px;accent-color:var(--bordeaux);margin:0;flex:none}
+.check span{cursor:pointer}
+
+.total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  margin-top:10px;padding:12px;background:var(--field);border-bottom:2px solid var(--bordeaux)}
+.total span{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.total b{font-size:19px;color:var(--bordeaux);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--hair);
+  padding:12px 22px;padding-bottom:calc(12px + env(safe-area-inset-bottom));
+  display:flex;gap:10px;justify-content:flex-end;z-index:9}
+button{font:inherit;font-size:15px;padding:12px 20px;border-radius:2px;cursor:pointer;border:1.5px solid var(--bordeaux)}
+button.primary{background:var(--bordeaux);color:#fff}
+button.ghost{background:transparent;color:var(--bordeaux)}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+.stagehead{display:none;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.stagehead span{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.zoom{font-size:12px;padding:6px 12px;background:transparent;color:var(--bordeaux)}
+
+.sheetbox{overflow-x:hidden;overflow-y:hidden;margin:0 auto}
+.sheetwrap{transform-origin:top left;width:794px}
+.sheet{width:21cm;min-height:29.7cm;background:var(--paper);
+  padding:1.8cm 2cm 1.6cm;box-shadow:0 2px 20px rgba(0,0,0,.14);position:relative}
+
+/* ---------- Dokument (identisch für Vorschau und Word) ---------- */
+DOC_STYLE_PLACEHOLDER
+
+.sheetfoot{position:absolute;left:2cm;right:2cm;bottom:1.1cm;border-top:.5pt solid #C9C4BE;
+  padding-top:5px;font:8pt Arial,sans-serif;color:#5F5F5F}
+
+@media (max-width:900px){
+  .app{display:block}
+  .panel{width:100%;min-height:0;border-right:0;border-bottom:1px solid var(--hair);padding:18px 16px 22px}
+  .stage{padding:18px 16px 110px}
+  .stagehead{display:flex}
+  .bar button{flex:1}
+  .bar{padding-left:16px;padding-right:16px}
+}
+@media (max-width:520px){
+  .pair{display:block}
+  .pair .row label{flex:0 0 128px}
+}
+@media print{
+  html,body{background:#fff;overflow:visible}
+  .panel,.bar,.stagehead{display:none!important}
+  .app,.stage{display:block;padding:0;margin:0}
+  .sheetbox{overflow:visible;width:auto!important;height:auto!important;margin:0}
+  .sheetwrap{transform:none!important;width:auto!important}
+  .sheet{width:auto;min-height:0;box-shadow:none;padding:1.8cm 2cm 1.6cm}
+  .sheetfoot{position:fixed;bottom:1.1cm}
+  @page{size:A4;margin:0}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="panel">
+    <div class="brandbar"><strong>ALLEGRA AUTO</strong></div>
+    <p class="sub">Angaben ausfüllen – die Offerte entsteht daneben. Leere Felder werden weggelassen.</p>
+
+    <fieldset>
+      <legend>Offerte</legend>
+      <div class="pair">
+        <div class="row"><label for="nr">Nummer</label><input id="nr" placeholder="2026-001"></div>
+        <div class="row"><label for="datum">Datum</label><input id="datum" type="date"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Kunde</legend>
+      <div class="row"><label for="kName">Name / Firma</label><input id="kName" placeholder="Muster AG"></div>
+      <div class="row"><label for="kStrasse">Strasse Nr.</label><input id="kStrasse" placeholder="Bahnhofstrasse 1"></div>
+      <div class="row"><label for="kOrt">PLZ Ort</label><input id="kOrt" placeholder="7000 Chur"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Fahrzeug</legend>
+      <div class="row"><label for="marke">Marke / Typ</label><input id="marke" placeholder="Opel Movano 2.2"></div>
+      <div class="pair">
+        <div class="row"><label for="farbe">Farbe</label><input id="farbe" placeholder="weiss"></div>
+        <div class="row"><label for="inverkehr">1. Inverkehr.</label><input id="inverkehr" placeholder="28.03.2025"></div>
+      </div>
+      <div class="pair">
+        <div class="row"><label for="km">Kilometer</label><input id="km" inputmode="numeric" placeholder="410"></div>
+        <div class="row"><label for="kw">Leistung kW</label><input id="kw" inputmode="numeric" placeholder="103"></div>
+      </div>
+      <div class="pair">
+        <div class="row"><label for="mfk">Letzte MFK</label><input id="mfk" placeholder="13.04.2026"></div>
+        <div class="row"><label for="schluessel">Schlüssel</label><input id="schluessel" inputmode="numeric" placeholder="2"></div>
+      </div>
+      <div class="row"><label for="unfall">Unfallfrei</label>
+        <select id="unfall">
+          <option value="">nicht angeben</option>
+          <option value="ja" selected>ja</option>
+          <option value="nein">nein</option>
+        </select>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Preis</legend>
+      <div class="row"><label for="preis">Fahrzeugpreis</label><input id="preis" inputmode="decimal" placeholder="31430"></div>
+      <div class="row"><label for="pauschale">Ablieferung</label><input id="pauschale" inputmode="decimal" placeholder="450"></div>
+      <div class="row"><label for="eintausch">Eintausch −</label><input id="eintausch" inputmode="decimal" placeholder="0"></div>
+      <div class="check"><input type="checkbox" id="mwst" checked><span id="mwstLbl">Zeile als «inkl. 8.1% MWST» beschriften</span></div>
+      <div class="total"><span>Total</span><b id="totalOut">CHF 0.00</b></div>
+    </fieldset>
+  </aside>
+
+  <main class="stage">
+    <div class="stagehead">
+      <span>Vorschau</span>
+      <button class="zoom" id="btnZoom">Originalgrösse</button>
+    </div>
+    <div class="sheetbox" id="sheetbox">
+      <div class="sheetwrap" id="sheetwrap">
+        <div class="sheet" id="sheet">
+          <div class="doc" id="doc"></div>
+          <div class="sheetfoot">Allegra Auto GmbH &nbsp;·&nbsp; info@allegra-auto.ch</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="bar">
+  <button class="ghost" id="btnWord">Word herunterladen</button>
+  <button class="primary" id="btnPrint">Drucken / PDF</button>
+</div>
+
+<script>
+/* ===== Dokumentstil – eine Quelle für Vorschau und Word ===== */
+const DOC_CSS = `
+.doc{font-family:Arial,Helvetica,sans-serif;color:#2B2B2B;font-size:11pt;line-height:1.35}
+.doc table{border-collapse:collapse;width:17cm;table-layout:fixed}
+.doc td{vertical-align:top;padding:0}
+.doc .firm{font-size:12pt;font-weight:bold;color:#6B1F2E;letter-spacing:.10em;padding-bottom:2pt}
+.doc .meta{font-size:8pt;color:#5F5F5F;line-height:1.45}
+.doc .rt{text-align:right}
+.doc .rule{border-bottom:1.25pt solid #6B1F2E;height:5pt}
+.doc .tiny{font-size:7.5pt;color:#5F5F5F;padding-bottom:2pt}
+.doc .addr td{padding-top:16pt}
+.doc .datum td{padding-top:34pt;font-size:11pt;color:#5F5F5F}
+.doc .title{font-size:16pt;font-weight:bold;margin:20pt 0 7pt}
+.doc .intro{font-size:11pt;margin:0 0 4pt}
+.doc .sec{font-size:9pt;font-weight:bold;color:#6B1F2E;letter-spacing:.12em;
+  border-bottom:.75pt solid #6B1F2E;margin:12pt 0 5pt;padding-bottom:3pt}
+.doc .grid td{border-top:.5pt solid #C9C4BE;border-bottom:.5pt solid #C9C4BE;padding:3.5pt 5pt}
+.doc .grid td.k{background:#F2F0ED;color:#5F5F5F;font-size:10pt}
+.doc .grid td.v{font-size:10pt}
+.doc .grid td.blank{border:0;background:#fff}
+.doc .price td{border-top:.5pt solid #C9C4BE;border-bottom:.5pt solid #C9C4BE;padding:4pt 5pt;font-size:11pt}
+.doc .price td.a{text-align:right}
+.doc .price tr.sum td{background:#F2F0ED;font-weight:bold}
+.doc .greet{font-size:11pt;margin:34pt 0 0}
+.doc .greet2{font-size:11pt;margin:14pt 0 0}
+`;
+(function(){
+  const st = document.querySelector('style');
+  st.textContent = st.textContent.replace('DOC_STYLE_PLACEHOLDER', DOC_CSS);
+})();
+
+/* ===== Helfer ===== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const num = v => {
+  const n = parseFloat(String(v || '').replace(/[’'\s]/g, '').replace(',', '.'));
+  return isFinite(n) ? n : 0;
+};
+const chf = n => 'CHF ' + n.toLocaleString('de-CH', {minimumFractionDigits:2, maximumFractionDigits:2});
+const int = n => Math.round(n).toLocaleString('de-CH');
+const dateDE = v => {
+  if (!v) return '';
+  const [y,m,d] = v.split('-');
+  return d && m && y ? d + '.' + m + '.' + y : v;
+};
+
+/* ===== Dokument bauen ===== */
+function buildDoc(){
+  const g = id => $(id).value.trim();
+  const kunde = [g('kName'), g('kStrasse'), g('kOrt')].filter(Boolean);
+  const nr = g('nr');
+
+  let out = '';
+  out += '<table><tr>'
+      + '<td style="width:10.6cm">'
+      + '<div class="firm">Allegra Auto GmbH</div>'
+      + '<div class="meta">Guflis 8, 7204 Untervaz &nbsp;·&nbsp; Tel. 078 707 43 61 &nbsp;·&nbsp; info@allegra-auto.ch</div>'
+      + '</td>'
+      + '<td style="width:6.4cm" class="rt">'
+      + '<div class="meta">Offerte Nr. ' + (nr ? esc(nr) : '__________') + '</div>'
+      + '<div class="meta">UID / MWST-Nr. &nbsp;CHE-___.___.___</div>'
+      + '</td></tr></table>';
+  out += '<table><tr><td class="rule"></td></tr></table>';
+
+  out += '<table class="addr"><tr><td style="width:12.5cm"></td><td style="width:4.5cm">'
+      + '<div class="tiny">Kunde</div>'
+      + (kunde.length ? kunde.map(l => '<div>' + esc(l) + '</div>').join('') : '<div>&nbsp;</div>')
+      + '</td></tr></table>';
+  out += '<table class="datum"><tr><td style="width:12.5cm"></td><td style="width:4.5cm">'
+      + esc(dateDE(g('datum'))) + '</td></tr></table>';
+
+  out += '<div class="title">Offerte Fahrzeugverkauf</div>';
+  out += '<div class="intro">Gerne unterbreiten wir Ihnen folgendes Angebot:</div>';
+
+  const pairs = [];
+  const add = (k, v) => { if (v) pairs.push([k, v]); };
+  add('Marke / Typ', g('marke'));
+  add('Farbe', g('farbe'));
+  add('1. Inverkehrsetzung', g('inverkehr'));
+  add('Kilometerstand', g('km') ? int(num(g('km'))) + ' km' : '');
+  add('Leistung', g('kw') ? int(num(g('kw'))) + ' kW' : '');
+  add('Letzte MFK', g('mfk'));
+  add('Unfallfrei', g('unfall'));
+  add('Anzahl Schlüssel', g('schluessel'));
+
+  if (pairs.length){
+    out += '<div class="sec">FAHRZEUG</div><table class="grid">';
+    for (let i = 0; i < pairs.length; i += 2){
+      out += '<tr>'
+        + '<td class="k" style="width:3.7cm">' + esc(pairs[i][0]) + '</td>'
+        + '<td class="v" style="width:4.8cm">' + esc(pairs[i][1]) + '</td>'
+        + (pairs[i+1]
+            ? '<td class="k" style="width:3.7cm">' + esc(pairs[i+1][0]) + '</td>'
+              + '<td class="v" style="width:4.8cm">' + esc(pairs[i+1][1]) + '</td>'
+            : '<td class="blank" colspan="2"></td>')
+        + '</tr>';
+    }
+    out += '</table>';
+  }
+
+  const preis = num(g('preis')), pausch = num(g('pauschale')), eint = num(g('eintausch'));
+  const total = preis + pausch - eint;
+  const lblPreis = $('mwst').checked ? 'Fahrzeugpreis inkl. 8.1% MWST' : 'Fahrzeugpreis';
+
+  out += '<div class="sec">PREIS</div><table class="price">';
+  out += '<tr><td style="width:12.1cm">' + lblPreis + '</td><td class="a" style="width:4.9cm">' + chf(preis) + '</td></tr>';
+  if (pausch) out += '<tr><td>Ablieferungspauschale</td><td class="a">' + chf(pausch) + '</td></tr>';
+  if (eint)   out += '<tr><td>Eintauschfahrzeug (Abzug)</td><td class="a">CHF – '
+      + eint.toLocaleString('de-CH', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</td></tr>';
+  out += '<tr class="sum"><td>Total Angebotspreis</td><td class="a">' + chf(total) + '</td></tr></table>';
+
+  out += '<div class="greet">Freundliche Grüsse</div><div class="greet2">Allegra Auto GmbH</div>';
+
+  $('totalOut').textContent = chf(total);
+  return out;
+}
+
+function render(){ $('doc').innerHTML = buildDoc(); fit(); }
+
+/* ===== Vorschau einpassen ===== */
+let zoomed = false;
+function fit(){
+  const stage = document.querySelector('.stage');
+  const box = $('sheetbox'), wrap = $('sheetwrap'), sheet = $('sheet');
+  const cs = getComputedStyle(stage);
+  const avail = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const s = zoomed ? 1 : Math.min(1, avail / 794);
+
+  wrap.style.transform = 'scale(' + s + ')';
+  box.style.width  = Math.min(794 * s, avail) + 'px';
+  box.style.height = (sheet.offsetHeight * s) + 'px';
+  box.style.overflowX = (794 * s > avail) ? 'auto' : 'hidden';
+  $('btnZoom').textContent = zoomed ? 'Einpassen' : 'Originalgrösse';
+}
+
+/* ===== Word-Datei ===== */
+function downloadWord(){
+  const body = buildDoc();
+  const html =
+'<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'
++ '<head><meta charset="utf-8"><style>'
++ '@page Section1 { size:21cm 29.7cm; margin:1.8cm 2cm 1.6cm 2cm; mso-footer:f1; }'
++ 'div.Section1 { page:Section1; }'
++ '.foot { font-family:Arial,sans-serif; font-size:8pt; color:#5F5F5F; border-top:.5pt solid #C9C4BE; padding-top:4pt; }'
++ DOC_CSS
++ '</style></head><body><div class="Section1"><div class="doc">' + body + '</div></div>'
++ '<div style="mso-element:footer" id="f1"><p class="foot">Allegra Auto GmbH &nbsp;·&nbsp; info@allegra-auto.ch</p></div>'
++ '</body></html>';
+
+  const kunde = $('kName').value.trim().replace(/[^\wäöüÄÖÜß -]/g, '').replace(/\s+/g, '-');
+  const stamp = $('datum').value || new Date().toISOString().slice(0,10);
+  const name = ['Offerte', kunde || $('nr').value.trim() || 'Entwurf', stamp].filter(Boolean).join('_') + '.doc';
+
+  const blob = new Blob(['\ufeff' + html], {type:'application/msword'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
+/* ===== Start ===== */
+document.querySelectorAll('.panel input, .panel select').forEach(el => {
+  el.addEventListener('input', render);
+  el.addEventListener('change', render);
+});
+$('mwstLbl').addEventListener('click', () => { $('mwst').checked = !$('mwst').checked; render(); });
+$('btnZoom').addEventListener('click', () => { zoomed = !zoomed; fit(); });
+$('btnPrint').addEventListener('click', () => window.print());
+$('btnWord').addEventListener('click', downloadWord);
+window.addEventListener('resize', fit);
+window.addEventListener('load', fit);
+
+$('datum').value = new Date().toISOString().slice(0,10);
+render();
+</script>
+</body>
+</html>
