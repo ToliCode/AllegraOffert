@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <title>Offerte erstellen – Allegra Auto GmbH</title>
 <style>
 :root{
@@ -404,6 +407,13 @@ window.addEventListener('load', fit);
 
 $('datum').value = new Date().toISOString().slice(0,10);
 render();
+
+/* ===== Als App installierbar / offline ===== */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
