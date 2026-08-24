@@ -7,7 +7,7 @@
 <title>Offerte erstellen – Allegra Auto GmbH</title>
 <style>
 :root{
-  --bordeaux:#6B1F2E;
+  --akzent:#000000;
   --ink:#2B2B2B;
   --muted:#5F5F5F;
   --hair:#C9C4BE;
@@ -27,42 +27,48 @@ html,body{margin:0;padding:0;background:var(--desk);color:var(--ink);
   padding:22px 22px 120px;min-height:100vh}
 .stage{flex:1;min-width:0;padding:26px}
 
-.brandbar strong{font-size:15px;font-weight:700;color:var(--bordeaux);letter-spacing:.14em}
+.brandbar strong{font-size:15px;font-weight:700;color:var(--akzent);letter-spacing:.14em}
 .panel .sub{font-size:12px;color:var(--muted);margin:6px 0 20px}
 
-fieldset{border:0;border-top:1.5px solid var(--bordeaux);margin:0 0 18px;padding:9px 0 0}
-legend{font-size:11px;font-weight:700;color:var(--bordeaux);letter-spacing:.13em;text-transform:uppercase;padding:0 6px 0 0}
+fieldset{border:0;border-top:1.5px solid var(--akzent);margin:0 0 18px;padding:9px 0 0}
+legend{font-size:11px;font-weight:700;color:var(--akzent);letter-spacing:.13em;text-transform:uppercase;padding:0 6px 0 0}
 .row{display:flex;align-items:stretch;border-bottom:1px solid var(--hair)}
 .row label{flex:0 0 128px;background:var(--field);color:var(--muted);font-size:11px;
   display:flex;align-items:center;padding:9px 10px;line-height:1.25}
 .row input,.row select{flex:1;min-width:0;width:100%;border:0;background:transparent;padding:9px 10px;
   font:inherit;font-size:16px;color:var(--ink);border-radius:0}
-.row input:focus,.row select:focus{outline:2px solid var(--bordeaux);outline-offset:-2px}
+.row input:focus,.row select:focus{outline:2px solid var(--akzent);outline-offset:-2px}
 .row select{appearance:none;-webkit-appearance:none}
 .pair{display:flex}
 .pair .row{flex:1;min-width:0}
 .pair .row label{flex:0 0 92px}
 
+.block{border-bottom:1px solid var(--hair)}
+.block label{display:block;background:var(--field);color:var(--muted);font-size:11px;padding:9px 10px}
+.block textarea{display:block;width:100%;border:0;background:transparent;padding:9px 10px;
+  font:inherit;font-size:16px;line-height:1.4;color:var(--ink);resize:vertical;min-height:82px}
+.block textarea:focus{outline:2px solid var(--akzent);outline-offset:-2px}
+
 .check{display:flex;align-items:center;gap:9px;padding:12px 2px;font-size:13px;color:var(--muted)}
-.check input{width:18px;height:18px;accent-color:var(--bordeaux);margin:0;flex:none}
+.check input{width:18px;height:18px;accent-color:var(--akzent);margin:0;flex:none}
 .check span{cursor:pointer}
 
 .total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
-  margin-top:10px;padding:12px;background:var(--field);border-bottom:2px solid var(--bordeaux)}
+  margin-top:10px;padding:12px;background:var(--field);border-bottom:2px solid var(--akzent)}
 .total span{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-.total b{font-size:19px;color:var(--bordeaux);font-variant-numeric:tabular-nums;white-space:nowrap}
+.total b{font-size:19px;color:var(--akzent);font-variant-numeric:tabular-nums;white-space:nowrap}
 
 .bar{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--hair);
   padding:12px 22px;padding-bottom:calc(12px + env(safe-area-inset-bottom));
   display:flex;gap:10px;justify-content:flex-end;z-index:9}
-button{font:inherit;font-size:15px;padding:12px 20px;border-radius:2px;cursor:pointer;border:1.5px solid var(--bordeaux)}
-button.primary{background:var(--bordeaux);color:#fff}
-button.ghost{background:transparent;color:var(--bordeaux)}
+button{font:inherit;font-size:15px;padding:12px 20px;border-radius:2px;cursor:pointer;border:1.5px solid var(--akzent)}
+button.primary{background:var(--akzent);color:#fff}
+button.ghost{background:transparent;color:var(--akzent)}
 button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 
 .stagehead{display:none;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
 .stagehead span{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-.zoom{font-size:12px;padding:6px 12px;background:transparent;color:var(--bordeaux)}
+.zoom{font-size:12px;padding:6px 12px;background:transparent;color:var(--akzent)}
 
 .sheetbox{overflow-x:hidden;overflow-y:hidden;margin:0 auto}
 .sheetwrap{transform-origin:top left;width:794px}
@@ -122,6 +128,14 @@ DOC_STYLE_PLACEHOLDER
     </fieldset>
 
     <fieldset>
+      <legend>Anschreiben</legend>
+      <div class="block">
+        <label for="intro">Text über der Fahrzeugtabelle</label>
+        <textarea id="intro" rows="3">Gerne unterbreiten wir Ihnen folgendes Angebot:</textarea>
+      </div>
+    </fieldset>
+
+    <fieldset>
       <legend>Fahrzeug</legend>
       <div class="row"><label for="marke">Marke / Typ</label><input id="marke" placeholder="Opel Movano 2.2"></div>
       <div class="pair">
@@ -146,8 +160,23 @@ DOC_STYLE_PLACEHOLDER
     </fieldset>
 
     <fieldset>
+      <legend>Ausstattung</legend>
+      <div class="block">
+        <label for="ausstattung">Liste einfügen – Komma oder Zeilenumbruch trennt</label>
+        <textarea id="ausstattung" rows="4" placeholder="Anhängerkupplung 3500 kg inkl. E-Satz&#10;Navigationssystem&#10;Rückfahrkamera&#10;Sitzheizung"></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset>
       <legend>Preis</legend>
       <div class="row"><label for="preis">Fahrzeugpreis</label><input id="preis" inputmode="decimal" placeholder="31430"></div>
+      <div class="pair">
+        <div class="row"><label for="rabatt">Rabatt −</label><input id="rabatt" inputmode="decimal" placeholder="0"></div>
+        <div class="row"><label for="rabattArt">Einheit</label>
+          <select id="rabattArt"><option value="chf">CHF</option><option value="proz">Prozent</option></select>
+        </div>
+      </div>
+      <div class="row"><label for="rabattText">Bezeichnung</label><input id="rabattText" placeholder="Rabatt"></div>
       <div class="row"><label for="pauschale">Ablieferung</label><input id="pauschale" inputmode="decimal" placeholder="450"></div>
       <div class="row"><label for="eintausch">Eintausch −</label><input id="eintausch" inputmode="decimal" placeholder="0"></div>
       <div class="check"><input type="checkbox" id="mwst" checked><span id="mwstLbl">Zeile als «inkl. 8.1% MWST» beschriften</span></div>
@@ -182,21 +211,22 @@ const DOC_CSS = `
 .doc{font-family:Arial,Helvetica,sans-serif;color:#2B2B2B;font-size:11pt;line-height:1.35}
 .doc table{border-collapse:collapse;width:17cm;table-layout:fixed}
 .doc td{vertical-align:top;padding:0}
-.doc .firm{font-size:12pt;font-weight:bold;color:#6B1F2E;letter-spacing:.10em;padding-bottom:2pt}
+.doc .firm{font-size:12pt;font-weight:bold;color:#000000;letter-spacing:.10em;padding-bottom:2pt}
 .doc .meta{font-size:8pt;color:#5F5F5F;line-height:1.45}
 .doc .rt{text-align:right}
-.doc .rule{border-bottom:1.25pt solid #6B1F2E;height:5pt}
+.doc .rule{border-bottom:1.25pt solid #000000;height:5pt}
 .doc .tiny{font-size:7.5pt;color:#5F5F5F;padding-bottom:2pt}
 .doc .addr td{padding-top:16pt}
 .doc .datum td{padding-top:34pt;font-size:11pt;color:#5F5F5F}
 .doc .title{font-size:16pt;font-weight:bold;margin:20pt 0 7pt}
 .doc .intro{font-size:11pt;margin:0 0 4pt}
-.doc .sec{font-size:9pt;font-weight:bold;color:#6B1F2E;letter-spacing:.12em;
-  border-bottom:.75pt solid #6B1F2E;margin:12pt 0 5pt;padding-bottom:3pt}
+.doc .sec{font-size:9pt;font-weight:bold;color:#000000;letter-spacing:.12em;
+  border-bottom:.75pt solid #000000;margin:12pt 0 5pt;padding-bottom:3pt}
 .doc .grid td{border-top:.5pt solid #C9C4BE;border-bottom:.5pt solid #C9C4BE;padding:3.5pt 5pt}
 .doc .grid td.k{background:#F2F0ED;color:#5F5F5F;font-size:10pt}
 .doc .grid td.v{font-size:10pt}
 .doc .grid td.blank{border:0;background:#fff}
+.doc .ausst{font-size:10pt;line-height:1.4;margin:0;padding-top:1pt}
 .doc .price td{border-top:.5pt solid #C9C4BE;border-bottom:.5pt solid #C9C4BE;padding:4pt 5pt;font-size:11pt}
 .doc .price td.a{text-align:right}
 .doc .price tr.sum td{background:#F2F0ED;font-weight:bold}
@@ -249,7 +279,12 @@ function buildDoc(){
       + esc(dateDE(g('datum'))) + '</td></tr></table>';
 
   out += '<div class="title">Offerte Fahrzeugverkauf</div>';
-  out += '<div class="intro">Gerne unterbreiten wir Ihnen folgendes Angebot:</div>';
+  const introTxt = $('intro').value.replace(/\r/g, '');
+  if (introTxt.trim()){
+    introTxt.split('\n').forEach(line => {
+      out += '<div class="intro">' + (line.trim() ? esc(line) : '&nbsp;') + '</div>';
+    });
+  }
 
   const pairs = [];
   const add = (k, v) => { if (v) pairs.push([k, v]); };
@@ -277,15 +312,32 @@ function buildDoc(){
     out += '</table>';
   }
 
+  const ausst = $('ausstattung').value
+    .replace(/\r/g, '')
+    .split(/[\n;,]+/)
+    .map(s => s.replace(/^[\s\-–—•*·]+/, '').trim())
+    .filter(Boolean);
+  if (ausst.length){
+    out += '<div class="sec">AUSSTATTUNG</div>';
+    out += '<div class="ausst">' + esc(ausst.join(', ')) + '</div>';
+  }
+
   const preis = num(g('preis')), pausch = num(g('pauschale')), eint = num(g('eintausch'));
-  const total = preis + pausch - eint;
+  const rabEin = num(g('rabatt'));
+  const istProz = $('rabattArt').value === 'proz';
+  const rabattBetrag = istProz ? preis * rabEin / 100 : rabEin;
+  const total = preis - rabattBetrag + pausch - eint;
   const lblPreis = $('mwst').checked ? 'Fahrzeugpreis inkl. 8.1% MWST' : 'Fahrzeugpreis';
+  let lblRabatt = g('rabattText') || 'Rabatt';
+  if (istProz && rabEin) lblRabatt += ' ' + rabEin.toLocaleString('de-CH') + '%';
+
+  const abzug = n => 'CHF – ' + n.toLocaleString('de-CH', {minimumFractionDigits:2, maximumFractionDigits:2});
 
   out += '<div class="sec">PREIS</div><table class="price">';
   out += '<tr><td style="width:12.1cm">' + lblPreis + '</td><td class="a" style="width:4.9cm">' + chf(preis) + '</td></tr>';
+  if (rabattBetrag) out += '<tr><td>' + esc(lblRabatt) + '</td><td class="a">' + abzug(rabattBetrag) + '</td></tr>';
   if (pausch) out += '<tr><td>Ablieferungspauschale</td><td class="a">' + chf(pausch) + '</td></tr>';
-  if (eint)   out += '<tr><td>Eintauschfahrzeug (Abzug)</td><td class="a">CHF – '
-      + eint.toLocaleString('de-CH', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</td></tr>';
+  if (eint)   out += '<tr><td>Eintauschfahrzeug (Abzug)</td><td class="a">' + abzug(eint) + '</td></tr>';
   out += '<tr class="sum"><td>Total Angebotspreis</td><td class="a">' + chf(total) + '</td></tr></table>';
 
   out += '<div class="greet">Freundliche Grüsse</div><div class="greet2">Allegra Auto GmbH</div>';
@@ -339,7 +391,7 @@ function downloadWord(){
 }
 
 /* ===== Start ===== */
-document.querySelectorAll('.panel input, .panel select').forEach(el => {
+document.querySelectorAll('.panel input, .panel select, .panel textarea').forEach(el => {
   el.addEventListener('input', render);
   el.addEventListener('change', render);
 });
