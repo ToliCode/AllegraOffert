@@ -21,14 +21,39 @@
   color-scheme:light only;
 }
 *{box-sizing:border-box}
+[hidden]{display:none !important}
+
+/* ---------- Umschaltung ---------- */
+.tabs{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:26px;
+  background:var(--paper);border-bottom:1px solid var(--hair);padding:0 22px}
+.tabs .mark{font-size:13px;font-weight:700;color:var(--akzent);letter-spacing:.14em;margin-right:4px}
+.tabs button{border:0;background:none;padding:15px 0;font-size:12px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);border-bottom:2px solid transparent;border-radius:0}
+.tabs button[aria-selected="true"]{color:var(--akzent);border-bottom-color:var(--akzent)}
+
+/* ---------- Rechner ---------- */
+.calcwrap{display:flex;justify-content:center;padding:34px 22px 40px}
+.calc{width:100%;max-width:460px}
+.calc h2{font-size:19px;font-weight:600;margin:0 0 4px}
+.calc .sub{font-size:13px;color:var(--muted);margin:0 0 22px}
+.linkbtn{border:0;background:none;color:var(--muted);font-size:12px;padding:10px 0 2px;
+  text-decoration:underline;text-underline-offset:3px;border-radius:0}
+.linkbtn:hover{color:var(--ink)}
+.calcres{margin-top:18px;padding:16px 16px 14px;background:var(--field);border-bottom:2px solid var(--akzent)}
+.calcres-label{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.calcres-value{font-size:30px;font-weight:600;color:var(--akzent);font-variant-numeric:tabular-nums;margin-top:4px}
+.calcbreak{margin-top:12px;padding-top:9px;border-top:1px solid var(--hair);
+  font-size:12.5px;color:var(--muted);line-height:1.9}
+.calcbreak div{display:flex;justify-content:space-between;gap:12px}
+.calcbreak span:last-child{color:var(--ink);font-variant-numeric:tabular-nums}
 html,body{margin:0;padding:0;background:var(--desk);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   -webkit-text-size-adjust:100%;overflow-x:hidden}
 
 /* ---------- App-Rahmen ---------- */
-.app{display:flex;align-items:flex-start;min-height:100vh}
+.app{display:flex;align-items:flex-start;min-height:calc(100vh - 49px)}
 .panel{flex:0 0 380px;background:var(--paper);border-right:1px solid var(--hair);
-  padding:22px 22px 120px;min-height:100vh}
+  padding:22px 22px 120px;min-height:calc(100vh - 49px)}
 .stage{flex:1;min-width:0;padding:26px}
 
 .brandbar strong{font-size:15px;font-weight:700;color:var(--akzent);letter-spacing:.14em}
@@ -43,6 +68,7 @@ legend{font-size:11px;font-weight:700;color:var(--akzent);letter-spacing:.13em;t
   font:inherit;font-size:16px;color:var(--ink);border-radius:0}
 .row input:focus,.row select:focus{outline:2px solid var(--akzent);outline-offset:-2px}
 .row select{appearance:none;-webkit-appearance:none}
+.row select.unitsel{flex:0 0 76px;border-left:1px solid var(--hair);text-align:center;color:var(--muted)}
 .pair{display:flex}
 .pair .row{flex:1;min-width:0}
 .pair .row label{flex:0 0 92px}
@@ -93,13 +119,19 @@ DOC_STYLE_PLACEHOLDER
   .bar button{flex:1}
   .bar{padding-left:16px;padding-right:16px}
 }
+@media (max-width:430px){
+  .tabs{gap:18px;padding:0 16px}
+  .tabs .mark{display:none}
+  .calcwrap{padding:24px 16px 40px}
+}
 @media (max-width:520px){
   .pair{display:block}
   .pair .row label{flex:0 0 128px}
 }
 @media print{
   html,body{background:#fff;overflow:visible}
-  .panel,.bar,.stagehead{display:none!important}
+  .panel,.bar,.stagehead,.tabs,#view-rechner{display:none!important}
+  #view-offerte{display:block!important}
   .app,.stage{display:block;padding:0;margin:0}
   .sheetbox{overflow:visible;width:auto!important;height:auto!important;margin:0}
   .sheetwrap{transform:none!important;width:auto!important}
@@ -111,9 +143,41 @@ DOC_STYLE_PLACEHOLDER
 </head>
 <body>
 
+<nav class="tabs">
+  <span class="mark">ALLEGRA AUTO</span>
+  <button id="tabRechner" aria-selected="true">Rechner</button>
+  <button id="tabOfferte" aria-selected="false">Offerte</button>
+</nav>
+
+<section class="view" id="view-rechner">
+  <div class="calcwrap">
+    <div class="calc">
+      <h2>Preisrechner DE → CH</h2>
+      <p class="sub">Netto-Einkaufspreis in EUR → geschätzter CHF-Zielpreis</p>
+
+      <fieldset>
+        <legend>Einkauf</legend>
+        <div class="row"><label for="eur">Nettopreis EUR</label><input id="eur" inputmode="decimal" placeholder="0"></div>
+        <div class="row"><label for="fix">Fixzuschlag CHF</label><input id="fix" inputmode="decimal" value="1000"></div>
+        <button class="linkbtn" id="toggleAdv">Erweiterte Werte anzeigen</button>
+        <div class="pair" id="advFields" hidden>
+          <div class="row"><label for="fx">Kurs</label><input id="fx" inputmode="decimal" value="0.95"></div>
+          <div class="row"><label for="pct">Aufschlag %</label><input id="pct" inputmode="decimal" value="13"></div>
+        </div>
+      </fieldset>
+
+      <div class="calcres">
+        <div class="calcres-label">Zielpreis CHF</div>
+        <div class="calcres-value" id="calcOut">CHF 0.00</div>
+        <div class="calcbreak" id="calcBreak"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="view-offerte" hidden>
 <div class="app">
   <aside class="panel">
-    <div class="brandbar"><strong>ALLEGRA AUTO</strong></div>
     <p class="sub">Angaben ausfüllen – die Offerte entsteht daneben. Leere Felder werden weggelassen.</p>
 
     <fieldset>
@@ -148,7 +212,7 @@ DOC_STYLE_PLACEHOLDER
       </div>
       <div class="pair">
         <div class="row"><label for="km">Kilometer</label><input id="km" inputmode="numeric" placeholder="410"></div>
-        <div class="row"><label for="kw">Leistung kW</label><input id="kw" inputmode="numeric" placeholder="103"></div>
+        <div class="row"><label for="kw">Leistung</label><input id="kw" inputmode="numeric" placeholder="103"><select id="kwUnit" class="unitsel"><option value="kW">kW</option><option value="PS">PS</option></select></div>
       </div>
       <div class="pair">
         <div class="row"><label for="mfk">Letzte MFK</label><input id="mfk" placeholder="13.04.2026"></div>
@@ -161,6 +225,7 @@ DOC_STYLE_PLACEHOLDER
           <option value="nein">nein</option>
         </select>
       </div>
+      <div class="check"><input type="checkbox" id="kwBoth"><span id="kwBothLbl">Leistung in kW und PS anzeigen</span></div>
     </fieldset>
 
     <fieldset>
@@ -203,8 +268,9 @@ DOC_STYLE_PLACEHOLDER
     </div>
   </main>
 </div>
+</section>
 
-<div class="bar">
+<div class="bar" id="bar" hidden>
   <button class="ghost" id="btnWord">Word herunterladen</button>
   <button class="primary" id="btnPrint">Drucken / PDF</button>
 </div>
@@ -283,12 +349,12 @@ function buildDoc(){
       + esc(dateDE(g('datum'))) + '</td></tr></table>';
 
   out += '<div class="title">Offerte Fahrzeugverkauf</div>';
-  const introTxt = $('intro').value.replace(/\r/g, '');
-  if (introTxt.trim()){
-    introTxt.split('\n').forEach(line => {
-      out += '<div class="intro">' + (line.trim() ? esc(line) : '&nbsp;') + '</div>';
-    });
-  }
+  const introZeilen = $('intro').value.replace(/\r/g, '').split('\n');
+  while (introZeilen.length && !introZeilen[0].trim()) introZeilen.shift();
+  while (introZeilen.length && !introZeilen[introZeilen.length - 1].trim()) introZeilen.pop();
+  introZeilen.forEach(line => {
+    out += '<div class="intro">' + (line.trim() ? esc(line) : '&nbsp;') + '</div>';
+  });
 
   const pairs = [];
   const add = (k, v) => { if (v) pairs.push([k, v]); };
@@ -296,7 +362,17 @@ function buildDoc(){
   add('Farbe', g('farbe'));
   add('1. Inverkehrsetzung', g('inverkehr'));
   add('Kilometerstand', g('km') ? int(num(g('km'))) + ' km' : '');
-  add('Leistung', g('kw') ? int(num(g('kw'))) + ' kW' : '');
+  let leistung = '';
+  if (g('kw')){
+    const wert = num(g('kw'));
+    const einheit = $('kwUnit').value;
+    const kw = einheit === 'kW' ? wert : wert * 0.735499;
+    const ps = einheit === 'PS' ? wert : wert * 1.359622;
+    leistung = $('kwBoth').checked
+      ? int(kw) + ' kW / ' + int(ps) + ' PS'
+      : int(wert) + ' ' + einheit;
+  }
+  add('Leistung', leistung);
   add('Letzte MFK', g('mfk'));
   add('Unfallfrei', g('unfall'));
   add('Anzahl Schlüssel', g('schluessel'));
@@ -359,6 +435,7 @@ function fit(){
   const box = $('sheetbox'), wrap = $('sheetwrap'), sheet = $('sheet');
   const cs = getComputedStyle(stage);
   const avail = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  if (avail <= 0) return;
   const s = zoomed ? 1 : Math.min(1, avail / 794);
 
   wrap.style.transform = 'scale(' + s + ')';
@@ -394,12 +471,46 @@ function downloadWord(){
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
 }
 
+/* ===== Preisrechner ===== */
+function calcRender(){
+  const eur = num($('eur').value), fx = num($('fx').value),
+        pct = num($('pct').value), fix = num($('fix').value);
+  const basis = eur * fx;
+  const auf = basis * pct / 100;
+  $('calcOut').textContent = chf(basis + auf + fix);
+  $('calcBreak').innerHTML =
+      '<div><span>Basis (EUR × ' + fx.toLocaleString('de-CH') + ')</span><span>' + chf(basis) + '</span></div>'
+    + '<div><span>+ ' + pct.toLocaleString('de-CH') + '%</span><span>' + chf(auf) + '</span></div>'
+    + '<div><span>+ Fixzuschlag</span><span>' + chf(fix) + '</span></div>';
+}
+['eur', 'fx', 'pct', 'fix'].forEach(id => $(id).addEventListener('input', calcRender));
+$('toggleAdv').addEventListener('click', () => {
+  const adv = $('advFields');
+  adv.hidden = !adv.hidden;
+  $('toggleAdv').textContent = adv.hidden ? 'Erweiterte Werte anzeigen' : 'Erweiterte Werte ausblenden';
+});
+
+/* ===== Umschaltung Rechner / Offerte ===== */
+function showView(name){
+  const rechner = name === 'rechner';
+  $('view-rechner').hidden = !rechner;
+  $('view-offerte').hidden = rechner;
+  $('bar').hidden = rechner;
+  $('tabRechner').setAttribute('aria-selected', String(rechner));
+  $('tabOfferte').setAttribute('aria-selected', String(!rechner));
+  if (!rechner) fit();
+  window.scrollTo(0, 0);
+}
+$('tabRechner').addEventListener('click', () => showView('rechner'));
+$('tabOfferte').addEventListener('click', () => showView('offerte'));
+
 /* ===== Start ===== */
 document.querySelectorAll('.panel input, .panel select, .panel textarea').forEach(el => {
   el.addEventListener('input', render);
   el.addEventListener('change', render);
 });
 $('mwstLbl').addEventListener('click', () => { $('mwst').checked = !$('mwst').checked; render(); });
+$('kwBothLbl').addEventListener('click', () => { $('kwBoth').checked = !$('kwBoth').checked; render(); });
 $('btnZoom').addEventListener('click', () => { zoomed = !zoomed; fit(); });
 $('btnPrint').addEventListener('click', () => window.print());
 $('btnWord').addEventListener('click', downloadWord);
@@ -408,6 +519,8 @@ window.addEventListener('load', fit);
 
 $('datum').value = new Date().toISOString().slice(0,10);
 render();
+calcRender();
+showView('rechner');
 
 /* ===== Als App installierbar / offline ===== */
 if ('serviceWorker' in navigator) {
