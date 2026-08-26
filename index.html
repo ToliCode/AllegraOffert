@@ -108,8 +108,8 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 /* ---------- Dokument (identisch für Vorschau und Word) ---------- */
 DOC_STYLE_PLACEHOLDER
 
-.sheetfoot{position:absolute;left:2cm;right:2cm;bottom:1.1cm;border-top:.5pt solid #C9C4BE;
-  padding-top:5px;font:8pt Arial,sans-serif;color:#5F5F5F}
+.sheetfoot{position:absolute;left:2cm;right:2cm;bottom:1.1cm;border-top:.5pt solid #000000;
+  padding-top:6px;font:7.5pt Arial,sans-serif;color:#5F5F5F;text-align:center}
 
 @media (max-width:900px){
   .app{display:block}
@@ -212,7 +212,7 @@ DOC_STYLE_PLACEHOLDER
       </div>
       <div class="pair">
         <div class="row"><label for="km">Kilometer</label><input id="km" inputmode="numeric" placeholder="410"></div>
-        <div class="row"><label for="kw">Leistung</label><input id="kw" inputmode="numeric" placeholder="103"><select id="kwUnit" class="unitsel"><option value="kW">kW</option><option value="PS">PS</option></select></div>
+        <div class="row"><label for="kw">Leistung</label><input id="kw" inputmode="numeric" placeholder="103"><select id="kwUnit" class="unitsel"><option value="PS">PS</option><option value="kW">kW</option></select></div>
       </div>
       <div class="pair">
         <div class="row"><label for="mfk">Letzte MFK</label><input id="mfk" placeholder="13.04.2026"></div>
@@ -262,7 +262,7 @@ DOC_STYLE_PLACEHOLDER
       <div class="sheetwrap" id="sheetwrap">
         <div class="sheet" id="sheet">
           <div class="doc" id="doc"></div>
-          <div class="sheetfoot">Allegra Auto GmbH &nbsp;·&nbsp; info@allegra-auto.ch</div>
+          <div class="sheetfoot">Allegra Auto GmbH &nbsp;·&nbsp; Guflis 8 &nbsp;·&nbsp; 7204 Untervaz &nbsp;·&nbsp; 078 707 43 61 &nbsp;·&nbsp; info@allegra-auto.ch</div>
         </div>
       </div>
     </div>
@@ -300,8 +300,8 @@ const DOC_CSS = `
 .doc .price td{border-top:.5pt solid #C9C4BE;border-bottom:.5pt solid #C9C4BE;padding:4pt 5pt;font-size:11pt}
 .doc .price td.a{text-align:right}
 .doc .price tr.sum td{background:#F2F0ED;font-weight:bold}
-.doc .greet{font-size:11pt;margin:34pt 0 0}
-.doc .greet2{font-size:11pt;margin:14pt 0 0}
+.doc .greet{font-size:11pt;margin:34pt 0 0;text-align:right}
+.doc .greet2{font-size:11pt;margin:14pt 0 0;text-align:right}
 `;
 (function(){
   const st = document.querySelector('style');
@@ -331,13 +331,9 @@ function buildDoc(){
 
   let out = '';
   out += '<table><tr>'
-      + '<td style="width:10.6cm">'
-      + '<div class="firm">Allegra Auto GmbH</div>'
-      + '<div class="meta">Guflis 8, 7204 Untervaz &nbsp;·&nbsp; Tel. 078 707 43 61 &nbsp;·&nbsp; info@allegra-auto.ch</div>'
-      + '</td>'
+      + '<td style="width:10.6cm"><div class="firm">Allegra Auto</div></td>'
       + '<td style="width:6.4cm" class="rt">'
       + '<div class="meta">Offerte Nr. ' + (nr ? esc(nr) : '__________') + '</div>'
-      + '<div class="meta">UID / MWST-Nr. &nbsp;CHE-___.___.___</div>'
       + '</td></tr></table>';
   out += '<table><tr><td class="rule"></td></tr></table>';
 
@@ -420,7 +416,7 @@ function buildDoc(){
   if (eint)   out += '<tr><td>Eintauschfahrzeug (Abzug)</td><td class="a">' + abzug(eint) + '</td></tr>';
   out += '<tr class="sum"><td>Total Angebotspreis</td><td class="a">' + chf(total) + '</td></tr></table>';
 
-  out += '<div class="greet">Freundliche Grüsse</div><div class="greet2">Allegra Auto GmbH</div>';
+  out += '<div class="greet">Freundliche Grüsse</div><div class="greet2">Allegra Auto</div>';
 
   $('totalOut').textContent = chf(total);
   return out;
@@ -453,10 +449,10 @@ function downloadWord(){
 + '<head><meta charset="utf-8"><style>'
 + '@page Section1 { size:21cm 29.7cm; margin:1.8cm 2cm 1.6cm 2cm; mso-footer:f1; }'
 + 'div.Section1 { page:Section1; }'
-+ '.foot { font-family:Arial,sans-serif; font-size:8pt; color:#5F5F5F; border-top:.5pt solid #C9C4BE; padding-top:4pt; }'
++ '.foot { font-family:Arial,sans-serif; font-size:7.5pt; color:#5F5F5F; border-top:.5pt solid #000000; padding-top:4pt; text-align:center; }'
 + DOC_CSS
 + '</style></head><body><div class="Section1"><div class="doc">' + body + '</div></div>'
-+ '<div style="mso-element:footer" id="f1"><p class="foot">Allegra Auto GmbH &nbsp;·&nbsp; info@allegra-auto.ch</p></div>'
++ '<div style="mso-element:footer" id="f1"><p class="foot">Allegra Auto GmbH &nbsp;·&nbsp; Guflis 8 &nbsp;·&nbsp; 7204 Untervaz &nbsp;·&nbsp; 078 707 43 61 &nbsp;·&nbsp; info@allegra-auto.ch</p></div>'
 + '</body></html>';
 
   const kunde = $('kName').value.trim().replace(/[^\wäöüÄÖÜß -]/g, '').replace(/\s+/g, '-');
