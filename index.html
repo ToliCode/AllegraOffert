@@ -214,6 +214,7 @@ DOC_STYLE_PLACEHOLDER
         <div class="row"><label for="km">Kilometer</label><input id="km" inputmode="numeric" placeholder="410"></div>
         <div class="row"><label for="kw">Leistung</label><input id="kw" inputmode="numeric" placeholder="103"><select id="kwUnit" class="unitsel"><option value="PS">PS</option><option value="kW">kW</option></select></div>
       </div>
+      <div class="row"><label for="hubraum">Hubraum cm³</label><input id="hubraum" inputmode="numeric" placeholder="1373"></div>
       <div class="pair">
         <div class="row"><label for="mfk">Letzte MFK</label><input id="mfk" placeholder="13.04.2026"></div>
         <div class="row"><label for="schluessel">Schlüssel</label><input id="schluessel" inputmode="numeric" placeholder="2"></div>
@@ -369,6 +370,7 @@ function buildDoc(){
       : int(wert) + ' ' + einheit;
   }
   add('Leistung', leistung);
+  add('Hubraum', g('hubraum') ? String(Math.round(num(g('hubraum')))) + ' cm³' : '');
   add('Letzte MFK', g('mfk'));
   add('Unfallfrei', g('unfall'));
   add('Anzahl Schlüssel', g('schluessel'));
