@@ -201,10 +201,21 @@ DOC_STYLE_PLACEHOLDER
 
     <fieldset>
       <legend>Anschreiben</legend>
+      <div class="row"><label for="anrede">Anrede</label>
+        <select id="anrede">
+          <option value="sieH" selected>Sie – Herr</option>
+          <option value="sieF">Sie – Frau</option>
+          <option value="du">du</option>
+          <option value="ihr">ihr</option>
+        </select>
+      </div>
       <div class="block">
         <label for="intro">Text über der Fahrzeugtabelle</label>
-        <textarea id="intro" rows="3">Gerne unterbreiten wir Ihnen folgendes Angebot:</textarea>
+        <textarea id="intro" rows="4">Allegra Herr [Name]
+
+Wir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende Angebot.</textarea>
       </div>
+      <div class="linkrow"><button class="linkbtn" id="btnTextLeeren">Text leeren</button></div>
     </fieldset>
 
     <fieldset>
@@ -372,7 +383,7 @@ DOC_STYLE_PLACEHOLDER
     <fieldset>
       <legend>Bemerkungen</legend>
       <div class="block">
-        <label for="vBem">Bekannte Mängel – leer lassen für Linien von Hand</label>
+        <label for="vBem">Leer lassen für Linien zum Ausfüllen von Hand</label>
         <textarea id="vBem" rows="3"></textarea>
       </div>
     </fieldset>
@@ -598,6 +609,16 @@ function downloadWord(){
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
 }
 
+/* ===== Anschreiben ===== */
+const ANREDEN = {
+  sieH: 'Allegra Herr [Name]\n\nWir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende Angebot.',
+  sieF: 'Allegra Frau [Name]\n\nWir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende Angebot.',
+  du:   'Allegra [Name]\n\nWir danken dir für dein Interesse. Gerne unterbreiten wir dir das folgende Angebot.',
+  ihr:  'Allegra [Name]\n\nWir danken euch für euer Interesse. Gerne unterbreiten wir euch das folgende Angebot.'
+};
+$('anrede').addEventListener('change', () => { $('intro').value = ANREDEN[$('anrede').value]; render(); });
+$('btnTextLeeren').addEventListener('click', () => { $('intro').value = ''; render(); });
+
 /* ===== Kaufvertrag ===== */
 const AGB_ALLE = [
   ['1.', 'Fahrzeugzustand', [
@@ -712,7 +733,7 @@ function buildVertrag1(){
     [['Übergabe', 'Datum ' + (g('vUeDatum') || '__________________') + '\u2003 Ort ' + (g('vUeOrt') || '__________________')]]
   ]);
 
-  out += '<div class="sec">BEMERKUNGEN / BEKANNTE MÄNGEL</div>';
+  out += '<div class="sec">BEMERKUNGEN</div>';
   const bem = g('vBem');
   if (bem){
     bem.split('\n').forEach(l => { if (l.trim()) out += '<div class="cltxt">' + esc(l) + '</div>'; });
