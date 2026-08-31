@@ -104,6 +104,8 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .sheetwrap{transform-origin:top left;width:794px}
 .sheet{width:21cm;min-height:29.7cm;background:var(--paper);
   padding:1.8cm 2cm 1.6cm;box-shadow:0 2px 20px rgba(0,0,0,.14);position:relative}
+.sheet + .sheet{margin-top:22px}
+.linkrow{padding:0 0 14px}
 
 /* ---------- Dokument (identisch für Vorschau und Word) ---------- */
 DOC_STYLE_PLACEHOLDER
@@ -131,12 +133,13 @@ DOC_STYLE_PLACEHOLDER
 @media print{
   html,body{background:#fff;overflow:visible}
   .panel,.bar,.stagehead,.tabs,#view-rechner{display:none!important}
-  #view-offerte{display:block!important}
   .app,.stage{display:block;padding:0;margin:0}
   .sheetbox{overflow:visible;width:auto!important;height:auto!important;margin:0}
   .sheetwrap{transform:none!important;width:auto!important}
-  .sheet{width:auto;min-height:0;box-shadow:none;padding:1.8cm 2cm 1.6cm}
-  .sheetfoot{position:fixed;bottom:1.1cm}
+  .sheet{width:21cm;height:29.7cm;min-height:0;box-shadow:none;margin:0;
+    padding:1.8cm 2cm 1.6cm;page-break-after:always}
+  .sheet:last-child{page-break-after:auto}
+  .sheetfoot{position:absolute;bottom:1.1cm}
   @page{size:A4;margin:0}
 }
 </style>
@@ -147,6 +150,7 @@ DOC_STYLE_PLACEHOLDER
   <span class="mark">ALLEGRA AUTO</span>
   <button id="tabRechner" aria-selected="true">Rechner</button>
   <button id="tabOfferte" aria-selected="false">Offerte</button>
+  <button id="tabVertrag" aria-selected="false">Kaufvertrag</button>
 </nav>
 
 <section class="view" id="view-rechner">
@@ -254,17 +258,135 @@ DOC_STYLE_PLACEHOLDER
     </fieldset>
   </aside>
 
-  <main class="stage">
+  <main class="stage" id="stage-o">
     <div class="stagehead">
       <span>Vorschau</span>
-      <button class="zoom" id="btnZoom">Originalgrösse</button>
+      <button class="zoom" id="btnZoom-o">Originalgrösse</button>
     </div>
-    <div class="sheetbox" id="sheetbox">
-      <div class="sheetwrap" id="sheetwrap">
+    <div class="sheetbox" id="sheetbox-o">
+      <div class="sheetwrap" id="sheetwrap-o">
         <div class="sheet" id="sheet">
           <div class="doc" id="doc"></div>
           <div class="sheetfoot">Allegra Auto GmbH &nbsp;·&nbsp; Guflis 8 &nbsp;·&nbsp; 7204 Untervaz &nbsp;·&nbsp; 078 707 43 61 &nbsp;·&nbsp; info@allegra-auto.ch</div>
         </div>
+      </div>
+    </div>
+  </main>
+</div>
+</section>
+
+
+<section class="view" id="view-vertrag" hidden>
+<div class="app">
+  <aside class="panel">
+    <p class="sub">Kaufvertrag ausfüllen. Der Vertrag umfasst zwei Seiten.</p>
+
+    <div class="linkrow"><button class="linkbtn" id="btnUebernehmen">Daten aus Offerte übernehmen</button></div>
+
+    <fieldset>
+      <legend>Vertrag</legend>
+      <div class="pair">
+        <div class="row"><label for="vNr">Nummer</label><input id="vNr" placeholder="2026-001"></div>
+        <div class="row"><label for="vArt">Käufer ist</label>
+          <select id="vArt"><option value="Privatperson">Privatperson</option><option value="Fahrzeughändler / Garage">Händler</option></select>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Käufer</legend>
+      <div class="row"><label for="vName">Name / Firma</label><input id="vName"></div>
+      <div class="row"><label for="vVorname">Vorname / Kontakt</label><input id="vVorname"></div>
+      <div class="row"><label for="vStrasse">Strasse Nr.</label><input id="vStrasse"></div>
+      <div class="row"><label for="vOrt">PLZ / Ort</label><input id="vOrt"></div>
+      <div class="pair">
+        <div class="row"><label for="vTel">Telefon</label><input id="vTel"></div>
+        <div class="row"><label for="vMail">E-Mail</label><input id="vMail"></div>
+      </div>
+      <div class="row"><label for="vUid">UID / MWST-Nr.</label><input id="vUid" placeholder="nur bei Händler"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Fahrzeug</legend>
+      <div class="row"><label for="vMarke">Marke / Typ</label><input id="vMarke"></div>
+      <div class="pair">
+        <div class="row"><label for="vFarbe">Farbe</label><input id="vFarbe"></div>
+        <div class="row"><label for="vInverkehr">1. Inverkehr.</label><input id="vInverkehr"></div>
+      </div>
+      <div class="row"><label for="vVin">Chassis-Nr.</label><input id="vVin"></div>
+      <div class="row"><label for="vStamm">Stamm-Nr.</label><input id="vStamm"></div>
+      <div class="pair">
+        <div class="row"><label for="vKm">Kilometer</label><input id="vKm" inputmode="numeric"></div>
+        <div class="row"><label for="vKw">Leistung</label><input id="vKw" inputmode="numeric">
+          <select id="vKwUnit" class="unitsel"><option value="PS">PS</option><option value="kW">kW</option></select></div>
+      </div>
+      <div class="row"><label for="vHubraum">Hubraum cm³</label><input id="vHubraum" inputmode="numeric"></div>
+      <div class="pair">
+        <div class="row"><label for="vMfk">Letzte MFK</label><input id="vMfk"></div>
+        <div class="row"><label for="vSchluessel">Schlüssel</label><input id="vSchluessel" inputmode="numeric"></div>
+      </div>
+      <div class="pair">
+        <div class="row"><label for="vUnfall">Unfallfrei</label>
+          <select id="vUnfall"><option value="">nicht angeben</option><option value="ja" selected>ja</option><option value="nein">nein</option></select>
+        </div>
+        <div class="row"><label for="vZustand">Zustand</label>
+          <select id="vZustand"><option value="ab MFK" selected>ab MFK</option><option value="ohne MFK">ohne MFK</option></select>
+        </div>
+      </div>
+      <div class="check"><input type="checkbox" id="vKwBoth" checked><span id="vKwBothLbl">Leistung in kW und PS anzeigen</span></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Kaufpreis</legend>
+      <div class="row"><label for="vPreis">Verkaufspreis</label><input id="vPreis" inputmode="decimal"></div>
+      <div class="row"><label for="vUeber">Überführung</label><input id="vUeber" inputmode="decimal"></div>
+      <div class="row"><label for="vEintausch">Eintausch −</label><input id="vEintausch" inputmode="decimal"></div>
+      <div class="row"><label for="vMwst">MWST</label>
+        <select id="vMwst">
+          <option value="inkl" selected>inkl. 8.1% MWST</option>
+          <option value="exkl">exkl., 8.1% separat</option>
+          <option value="keine">keine MWST</option>
+        </select>
+      </div>
+      <div class="total"><span>Total</span><b id="vTotalOut">CHF 0.00</b></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Zahlung und Übergabe</legend>
+      <div class="row"><label for="vZahlung">Zahlung</label>
+        <select id="vZahlung">
+          <option value="bar bei Übergabe" selected>bar bei Übergabe</option>
+          <option value="Banküberweisung">Banküberweisung</option>
+          <option value="Vorauszahlung">Vorauszahlung</option>
+          <option value="tage">innert Tagen netto</option>
+        </select>
+        <input id="vTage" class="unitsel" inputmode="numeric" placeholder="Tage">
+      </div>
+      <div class="row"><label for="vBank">Bankverbindung</label><input id="vBank" value="[Bankname], IBAN CH__ ____ ____ ____ ____ _"></div>
+      <div class="pair">
+        <div class="row"><label for="vUeDatum">Übergabe am</label><input id="vUeDatum"></div>
+        <div class="row"><label for="vUeOrt">Übergabeort</label><input id="vUeOrt"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Bemerkungen</legend>
+      <div class="block">
+        <label for="vBem">Bekannte Mängel – leer lassen für Linien von Hand</label>
+        <textarea id="vBem" rows="3"></textarea>
+      </div>
+    </fieldset>
+  </aside>
+
+  <main class="stage" id="stage-v">
+    <div class="stagehead">
+      <span>Vorschau</span>
+      <button class="zoom" id="btnZoom-v">Originalgrösse</button>
+    </div>
+    <div class="sheetbox" id="sheetbox-v">
+      <div class="sheetwrap" id="sheetwrap-v">
+        <div class="sheet"><div class="doc" id="docV1"></div><div class="sheetfoot">Allegra Auto GmbH &nbsp;·&nbsp; Guflis 8 &nbsp;·&nbsp; 7204 Untervaz &nbsp;·&nbsp; 078 707 43 61 &nbsp;·&nbsp; info@allegra-auto.ch</div></div>
+        <div class="sheet"><div class="doc" id="docV2"></div><div class="sheetfoot">Allegra Auto GmbH &nbsp;·&nbsp; Guflis 8 &nbsp;·&nbsp; 7204 Untervaz &nbsp;·&nbsp; 078 707 43 61 &nbsp;·&nbsp; info@allegra-auto.ch</div></div>
       </div>
     </div>
   </main>
@@ -301,6 +423,14 @@ const DOC_CSS = `
 .doc .price td{border-top:.5pt solid #C9C4BE;border-bottom:.5pt solid #C9C4BE;padding:4pt 5pt;font-size:11pt}
 .doc .price td.a{text-align:right}
 .doc .price tr.sum td{background:#F2F0ED;font-weight:bold}
+.doc .agbnote{font-size:8pt;font-style:italic;color:#5F5F5F;margin:0 0 4pt}
+.doc .cl{font-size:9pt;font-weight:bold;margin:9pt 0 2pt}
+.doc .cltxt{font-size:8.5pt;line-height:1.35;margin:0 0 2pt}
+.doc .sig td{padding-top:24pt;font-size:8.5pt;vertical-align:top}
+.doc .sigline{margin-top:22pt}
+.doc .siglbl{font-size:7.5pt;color:#5F5F5F;margin-top:2pt}
+.doc .hint{font-size:8.5pt;margin:14pt 0 0}
+.doc .lines{font-size:8.5pt;margin:6pt 0 0;letter-spacing:.5px;color:#8A8A8A}
 .doc .greet{font-size:11pt;margin:34pt 0 0;text-align:right}
 .doc .greet2{font-size:11pt;margin:14pt 0 0;text-align:right}
 `;
@@ -427,21 +557,21 @@ function buildDoc(){
 function render(){ $('doc').innerHTML = buildDoc(); fit(); }
 
 /* ===== Vorschau einpassen ===== */
-let zoomed = false;
-function fit(){
-  const stage = document.querySelector('.stage');
-  const box = $('sheetbox'), wrap = $('sheetwrap'), sheet = $('sheet');
+const Z = { o: false, v: false };
+function fitView(k){
+  const stage = $('stage-' + k), box = $('sheetbox-' + k), wrap = $('sheetwrap-' + k);
   const cs = getComputedStyle(stage);
   const avail = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
   if (avail <= 0) return;
-  const s = zoomed ? 1 : Math.min(1, avail / 794);
+  const s = Z[k] ? 1 : Math.min(1, avail / 794);
 
   wrap.style.transform = 'scale(' + s + ')';
   box.style.width  = Math.min(794 * s, avail) + 'px';
-  box.style.height = (sheet.offsetHeight * s) + 'px';
+  box.style.height = (wrap.offsetHeight * s) + 'px';
   box.style.overflowX = (794 * s > avail) ? 'auto' : 'hidden';
-  $('btnZoom').textContent = zoomed ? 'Einpassen' : 'Originalgrösse';
+  $('btnZoom-' + k).textContent = Z[k] ? 'Einpassen' : 'Originalgrösse';
 }
+function fit(){ fitView('o'); }
 
 /* ===== Word-Datei ===== */
 function downloadWord(){
@@ -460,6 +590,214 @@ function downloadWord(){
   const kunde = $('kName').value.trim().replace(/[^\wäöüÄÖÜß -]/g, '').replace(/\s+/g, '-');
   const stamp = $('datum').value || new Date().toISOString().slice(0,10);
   const name = ['Offerte', kunde || $('nr').value.trim() || 'Entwurf', stamp].filter(Boolean).join('_') + '.doc';
+
+  const blob = new Blob(['\ufeff' + html], {type:'application/msword'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
+/* ===== Kaufvertrag ===== */
+const AGB_ALLE = [
+  ['1.', 'Fahrzeugzustand', [
+    'Das Fahrzeug wird gebraucht und im besichtigten Zustand verkauft. Angaben und technische Daten verstehen sich als Annäherungswerte.']],
+  ['2.', 'Gewährleistung', [
+    'Der Verkäufer schliesst jegliche Gewähr für Sachmängel aus, soweit gesetzlich zulässig. Der Ausschluss gilt nicht für arglistig verschwiegene Mängel (Art. 199 OR) und nicht für schriftliche Zusicherungen in diesem Vertrag.']],
+  ['3.', 'Garantie und MFK', [
+    '\u2610 Keine Werksgarantie.\u2003\u2610 Werksgarantie bis __________________ oder __________ km, was zuerst eintritt. Sie wird allein vom Hersteller erbracht.',
+    'Wird das Fahrzeug ohne MFK verkauft, gehen Vorführung und dafür nötige Arbeiten zulasten des Käufers.']],
+  ['4.', 'Eigentumsvorbehalt', [
+    'Das Fahrzeug bleibt bis zur vollständigen Bezahlung Eigentum des Verkäufers. Der Verkäufer kann einen Eigentumsvorbehalt nach Art. 715 ZGB eintragen lassen; der Käufer liefert die dafür nötigen Angaben.']],
+  ['5.', 'Übergabe, Nutzen und Gefahr', [
+    'Nutzen und Gefahr gehen mit der Übergabe an den Käufer oder dessen Transporteur über. Ab diesem Zeitpunkt trägt der Käufer Versicherung, Verkehrssteuer und Unterhalt. Bei vereinbarter Vorauszahlung erfolgt die Übergabe erst nach Gutschrift des vollen Betrages.']],
+  ['6.', 'Zahlungsverzug und Nichtabnahme', [
+    'Bei Zahlungsverzug kann der Verkäufer nach Ansetzung einer angemessenen Nachfrist vom Vertrag zurücktreten und Ersatz des tatsächlich entstandenen Schadens verlangen. Eine Anzahlung kann daran angerechnet werden.']],
+  ['7.', 'Eintauschfahrzeug', [
+    'Der Käufer sichert zu, alleiniger Eigentümer des Eintauschfahrzeugs zu sein und zutreffende Angaben gemacht zu haben. Der Übernahmewert gilt unter dem Vorbehalt unveränderten Zustands bis zur Übergabe.']],
+  ['8.', 'Schlussbestimmungen', [
+    'Nebenabreden sind nur schriftlich gültig. Im Übrigen gelten Art. 184 ff. OR. Anwendbar ist Schweizer Recht, Gerichtsstand ist der Sitz des Verkäufers.']]
+];
+
+const AGB_HAENDLER = [
+  ['9.', 'Geschäftscharakter und Prüfung', [
+    'Der Käufer erwirbt das Fahrzeug gewerbsmässig zum Wiederverkauf oder zur betrieblichen Verwendung. Es handelt sich um ein Geschäft unter Fachpersonen; der Käufer stützt seinen Entscheid auf eigene fachkundige Prüfung. Das Fahrzeug wird «wie besichtigt» verkauft.']],
+  ['10.', 'Rügefrist', [
+    'Mängel sind innert fünf Arbeitstagen nach Übernahme schriftlich anzuzeigen, versteckte Mängel innert fünf Arbeitstagen nach Entdeckung (Art. 201 OR). Ohne rechtzeitige Rüge gilt das Fahrzeug als genehmigt.']],
+  ['11.', 'Import, AGB und anwendbares Recht', [
+    'Bei importierten Fahrzeugen übergibt der Verkäufer die Zollveranlagungsverfügung und die Unterlagen für die Zulassung. Ist das Fahrzeug unverzollt, gehen Verzollung und Automobilsteuer zulasten des Käufers. AGB des Käufers gelten nicht. Das CISG ist ausgeschlossen.']]
+];
+
+function gitter(zeilen){
+  let out = '<table class="grid">';
+  zeilen.forEach(z => {
+    out += '<tr>';
+    if (z.length === 1){
+      out += '<td class="k" style="width:3.7cm">' + esc(z[0][0]) + '</td>'
+           + '<td class="v" colspan="3">' + esc(z[0][1] || ' ') + '</td>';
+    } else {
+      out += '<td class="k" style="width:3.7cm">' + esc(z[0][0]) + '</td>'
+           + '<td class="v" style="width:4.8cm">' + esc(z[0][1] || ' ') + '</td>'
+           + '<td class="k" style="width:3.7cm">' + esc(z[1][0]) + '</td>'
+           + '<td class="v" style="width:4.8cm">' + esc(z[1][1] || ' ') + '</td>';
+    }
+    out += '</tr>';
+  });
+  return out + '</table>';
+}
+
+function vLeistung(){
+  const g = id => $(id).value.trim();
+  if (!g('vKw')) return '';
+  const wert = num(g('vKw')), einheit = $('vKwUnit').value;
+  const kw = einheit === 'kW' ? wert : wert * 0.735499;
+  const ps = einheit === 'PS' ? wert : wert * 1.359622;
+  return $('vKwBoth').checked ? int(kw) + ' kW / ' + int(ps) + ' PS' : int(wert) + ' ' + einheit;
+}
+
+function vPreise(){
+  const preis = num($('vPreis').value), ueber = num($('vUeber').value), eint = num($('vEintausch').value);
+  const art = $('vMwst').value;
+  const mwst = art === 'exkl' ? (preis + ueber) * 0.081 : 0;
+  return { preis, ueber, eint, art, mwst, total: preis + ueber + mwst - eint };
+}
+
+function vZahlungText(){
+  const w = $('vZahlung').value;
+  if (w !== 'tage') return w;
+  const t = $('vTage').value.trim();
+  return 'zahlbar innert ' + (t || '____') + ' Tagen netto';
+}
+
+function buildVertrag1(){
+  const g = id => $(id).value.trim();
+  const nr = g('vNr');
+  let out = '';
+
+  out += '<table><tr>'
+      + '<td style="width:10.6cm"><div class="firm">Allegra Auto GmbH</div></td>'
+      + '<td style="width:6.4cm" class="rt">'
+      + '<div class="meta">Kaufvertrag Nr. ' + (nr ? esc(nr) : '__________') + '</div>'
+      + '<div class="meta">UID &nbsp;CHE-320.630.565</div>'
+      + '</td></tr></table>';
+  out += '<table><tr><td class="rule"></td></tr></table>';
+  out += '<div class="title">Kaufvertrag Fahrzeug</div>';
+
+  out += '<div class="sec">KÄUFER</div>';
+  out += gitter([
+    [['Käufer ist', $('vArt').value]],
+    [['Name / Firma', g('vName')], ['Vorname / Kontakt', g('vVorname')]],
+    [['Strasse Nr.', g('vStrasse')], ['PLZ / Ort', g('vOrt')]],
+    [['Telefon', g('vTel')], ['E-Mail', g('vMail')]],
+    [['UID / MWST-Nr.', g('vUid')]]
+  ]);
+
+  out += '<div class="sec">FAHRZEUG</div>';
+  out += gitter([
+    [['Marke / Typ', g('vMarke')], ['Farbe', g('vFarbe')]],
+    [['Chassis-Nr. (VIN)', g('vVin')], ['Stamm-Nr.', g('vStamm')]],
+    [['1. Inverkehrsetzung', g('vInverkehr')], ['Kilometerstand', g('vKm') ? int(num(g('vKm'))) + ' km' : '']],
+    [['Leistung', vLeistung()], ['Hubraum', g('vHubraum') ? String(Math.round(num(g('vHubraum')))) + ' cm³' : '']],
+    [['Letzte MFK', g('vMfk')], ['Anzahl Schlüssel', g('vSchluessel')]],
+    [['Unfallfrei', $('vUnfall').value], ['Zustand', $('vZustand').value]]
+  ]);
+
+  const P = vPreise();
+  out += '<div class="sec">KAUFPREIS</div><table class="price">';
+  out += '<tr><td style="width:12.1cm">Verkaufspreis' + (P.art === 'inkl' ? ' inkl. 8.1% MWST' : '')
+       + '</td><td class="a" style="width:4.9cm">' + chf(P.preis) + '</td></tr>';
+  if (P.ueber) out += '<tr><td>Überführung / Bereitstellung</td><td class="a">' + chf(P.ueber) + '</td></tr>';
+  if (P.eint)  out += '<tr><td>Eintauschfahrzeug (Abzug)</td><td class="a">CHF – '
+       + P.eint.toLocaleString('de-CH', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</td></tr>';
+  if (P.art === 'exkl') out += '<tr><td>MWST 8.1 %</td><td class="a">' + chf(P.mwst) + '</td></tr>';
+  out += '<tr class="sum"><td>Total</td><td class="a">' + chf(P.total) + '</td></tr></table>';
+  $('vTotalOut').textContent = chf(P.total);
+
+  out += '<div style="height:8pt"></div>';
+  out += gitter([
+    [['Zahlung', vZahlungText()]],
+    [['Bankverbindung', g('vBank')]],
+    [['Übergabe', 'Datum ' + (g('vUeDatum') || '__________________') + '\u2003 Ort ' + (g('vUeOrt') || '__________________')]]
+  ]);
+
+  out += '<div class="sec">BEMERKUNGEN / BEKANNTE MÄNGEL</div>';
+  const bem = g('vBem');
+  if (bem){
+    bem.split('\n').forEach(l => { if (l.trim()) out += '<div class="cltxt">' + esc(l) + '</div>'; });
+  } else {
+    out += '<div class="lines">________________________________________________________________________________________</div>';
+    out += '<div class="lines">________________________________________________________________________________________</div>';
+  }
+
+  out += '<div class="hint">Die Vertragsbestimmungen auf Seite 2 sind Teil dieses Vertrages. Der Käufer bestätigt mit seiner '
+       + 'Unterschrift, das Fahrzeug besichtigt zu haben und mit den Bestimmungen einverstanden zu sein.</div>';
+
+  out += '<table class="sig"><tr>'
+      + '<td style="width:8.5cm"><div>Ort / Datum:&nbsp; ____________________________</div>'
+      + '<div class="sigline">____________________________________</div>'
+      + '<div class="siglbl">Verkäufer – Allegra Auto GmbH</div></td>'
+      + '<td style="width:8.5cm"><div>Ort / Datum:&nbsp; ____________________________</div>'
+      + '<div class="sigline">____________________________________</div>'
+      + '<div class="siglbl">Käufer</div></td></tr></table>';
+  return out;
+}
+
+function buildVertrag2(){
+  let out = '<div class="sec">VERTRAGSBESTIMMUNGEN</div>';
+  out += '<div class="agbnote">Die Ziffern 1–8 gelten für alle Käufer. Die Ziffern 9–11 gelten zusätzlich, '
+       + 'wenn der Käufer ein Fahrzeughändler oder eine Garage ist.</div>';
+  const teil = (liste) => liste.forEach(c => {
+    out += '<div class="cl">' + c[0] + '\u2002' + c[1] + '</div>';
+    c[2].forEach(t => out += '<div class="cltxt">' + t + '</div>');
+  });
+  teil(AGB_ALLE);
+  out += '<div class="sec" style="margin-top:16pt">ZUSÄTZLICH BEI VERKAUF AN FAHRZEUGHÄNDLER / GARAGE</div>';
+  teil(AGB_HAENDLER);
+  return out;
+}
+
+function renderVertrag(){
+  $('docV1').innerHTML = buildVertrag1();
+  $('docV2').innerHTML = buildVertrag2();
+  fitView('v');
+}
+
+document.querySelectorAll('#view-vertrag input, #view-vertrag select, #view-vertrag textarea').forEach(el => {
+  el.addEventListener('input', renderVertrag);
+  el.addEventListener('change', renderVertrag);
+});
+$('vKwBothLbl').addEventListener('click', () => { $('vKwBoth').checked = !$('vKwBoth').checked; renderVertrag(); });
+
+/* Daten aus der Offerte holen */
+$('btnUebernehmen').addEventListener('click', () => {
+  const paare = [['kName','vName'],['kStrasse','vStrasse'],['kOrt','vOrt'],['marke','vMarke'],
+    ['farbe','vFarbe'],['inverkehr','vInverkehr'],['km','vKm'],['kw','vKw'],['kwUnit','vKwUnit'],
+    ['hubraum','vHubraum'],['mfk','vMfk'],['unfall','vUnfall'],['schluessel','vSchluessel'],
+    ['preis','vPreis'],['pauschale','vUeber'],['eintausch','vEintausch'],['nr','vNr']];
+  paare.forEach(([a, b]) => { if ($(a).value) $(b).value = $(a).value; });
+  $('vKwBoth').checked = $('kwBoth').checked;
+  renderVertrag();
+});
+
+/* Word-Datei für den Vertrag */
+function wordVertrag(){
+  const html =
+'<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'
++ '<head><meta charset="utf-8"><style>'
++ '@page Section1 { size:21cm 29.7cm; margin:1.8cm 2cm 1.6cm 2cm; mso-footer:f1; }'
++ 'div.Section1 { page:Section1; }'
++ '.foot { font-family:Arial,sans-serif; font-size:7.5pt; color:#5F5F5F; border-top:.5pt solid #000000; padding-top:4pt; text-align:center; }'
++ DOC_CSS
++ '</style></head><body><div class="Section1"><div class="doc">' + buildVertrag1() + '</div>'
++ '<br clear="all" style="mso-special-character:line-break;page-break-before:always">'
++ '<div class="doc">' + buildVertrag2() + '</div></div>'
++ '<div style="mso-element:footer" id="f1"><p class="foot">Allegra Auto GmbH &nbsp;·&nbsp; Guflis 8 &nbsp;·&nbsp; 7204 Untervaz &nbsp;·&nbsp; 078 707 43 61 &nbsp;·&nbsp; info@allegra-auto.ch</p></div>'
++ '</body></html>';
+
+  const kunde = $('vName').value.trim().replace(/[^\wäöüÄÖÜß -]/g, '').replace(/\s+/g, '-');
+  const name = ['Kaufvertrag', kunde || $('vNr').value.trim() || 'Entwurf',
+                new Date().toISOString().slice(0,10)].filter(Boolean).join('_') + '.doc';
 
   const blob = new Blob(['\ufeff' + html], {type:'application/msword'});
   const a = document.createElement('a');
@@ -489,18 +827,23 @@ $('toggleAdv').addEventListener('click', () => {
 });
 
 /* ===== Umschaltung Rechner / Offerte ===== */
+let aktiv = 'rechner';
 function showView(name){
-  const rechner = name === 'rechner';
-  $('view-rechner').hidden = !rechner;
-  $('view-offerte').hidden = rechner;
-  $('bar').hidden = rechner;
-  $('tabRechner').setAttribute('aria-selected', String(rechner));
-  $('tabOfferte').setAttribute('aria-selected', String(!rechner));
-  if (!rechner) fit();
+  aktiv = name;
+  $('view-rechner').hidden = name !== 'rechner';
+  $('view-offerte').hidden = name !== 'offerte';
+  $('view-vertrag').hidden = name !== 'vertrag';
+  $('bar').hidden = name === 'rechner';
+  $('tabRechner').setAttribute('aria-selected', String(name === 'rechner'));
+  $('tabOfferte').setAttribute('aria-selected', String(name === 'offerte'));
+  $('tabVertrag').setAttribute('aria-selected', String(name === 'vertrag'));
+  if (name === 'offerte') fitView('o');
+  if (name === 'vertrag') fitView('v');
   window.scrollTo(0, 0);
 }
 $('tabRechner').addEventListener('click', () => showView('rechner'));
 $('tabOfferte').addEventListener('click', () => showView('offerte'));
+$('tabVertrag').addEventListener('click', () => showView('vertrag'));
 
 /* ===== Start ===== */
 document.querySelectorAll('.panel input, .panel select, .panel textarea').forEach(el => {
@@ -509,15 +852,17 @@ document.querySelectorAll('.panel input, .panel select, .panel textarea').forEac
 });
 $('mwstLbl').addEventListener('click', () => { $('mwst').checked = !$('mwst').checked; render(); });
 $('kwBothLbl').addEventListener('click', () => { $('kwBoth').checked = !$('kwBoth').checked; render(); });
-$('btnZoom').addEventListener('click', () => { zoomed = !zoomed; fit(); });
+$('btnZoom-o').addEventListener('click', () => { Z.o = !Z.o; fitView('o'); });
+$('btnZoom-v').addEventListener('click', () => { Z.v = !Z.v; fitView('v'); });
 $('btnPrint').addEventListener('click', () => window.print());
-$('btnWord').addEventListener('click', downloadWord);
-window.addEventListener('resize', fit);
-window.addEventListener('load', fit);
+$('btnWord').addEventListener('click', () => aktiv === 'vertrag' ? wordVertrag() : downloadWord());
+window.addEventListener('resize', () => { fitView('o'); fitView('v'); });
+window.addEventListener('load', () => { fitView('o'); fitView('v'); });
 
 $('datum').value = new Date().toISOString().slice(0,10);
 render();
 calcRender();
+renderVertrag();
 showView('rechner');
 
 /* ===== Als App installierbar / offline ===== */
