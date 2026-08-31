@@ -423,7 +423,6 @@ const DOC_CSS = `
 .doc .price td{border-top:.5pt solid #C9C4BE;border-bottom:.5pt solid #C9C4BE;padding:4pt 5pt;font-size:11pt}
 .doc .price td.a{text-align:right}
 .doc .price tr.sum td{background:#F2F0ED;font-weight:bold}
-.doc .agbnote{font-size:8pt;font-style:italic;color:#5F5F5F;margin:0 0 4pt}
 .doc .cl{font-size:9pt;font-weight:bold;margin:9pt 0 2pt}
 .doc .cltxt{font-size:8.5pt;line-height:1.35;margin:0 0 2pt}
 .doc .sig td{padding-top:24pt;font-size:8.5pt;vertical-align:top}
@@ -620,14 +619,6 @@ const AGB_ALLE = [
     'Nebenabreden sind nur schriftlich gültig. Im Übrigen gelten Art. 184 ff. OR. Anwendbar ist Schweizer Recht, Gerichtsstand ist der Sitz des Verkäufers.']]
 ];
 
-const AGB_HAENDLER = [
-  ['9.', 'Geschäftscharakter und Prüfung', [
-    'Der Käufer erwirbt das Fahrzeug gewerbsmässig zum Wiederverkauf oder zur betrieblichen Verwendung. Es handelt sich um ein Geschäft unter Fachpersonen; der Käufer stützt seinen Entscheid auf eigene fachkundige Prüfung. Das Fahrzeug wird «wie besichtigt» verkauft.']],
-  ['10.', 'Rügefrist', [
-    'Mängel sind innert fünf Arbeitstagen nach Übernahme schriftlich anzuzeigen, versteckte Mängel innert fünf Arbeitstagen nach Entdeckung (Art. 201 OR). Ohne rechtzeitige Rüge gilt das Fahrzeug als genehmigt.']],
-  ['11.', 'Import, AGB und anwendbares Recht', [
-    'Bei importierten Fahrzeugen übergibt der Verkäufer die Zollveranlagungsverfügung und die Unterlagen für die Zulassung. Ist das Fahrzeug unverzollt, gehen Verzollung und Automobilsteuer zulasten des Käufers. AGB des Käufers gelten nicht. Das CISG ist ausgeschlossen.']]
-];
 
 function gitter(zeilen){
   let out = '<table class="grid">';
@@ -745,15 +736,10 @@ function buildVertrag1(){
 
 function buildVertrag2(){
   let out = '<div class="sec">VERTRAGSBESTIMMUNGEN</div>';
-  out += '<div class="agbnote">Die Ziffern 1–8 gelten für alle Käufer. Die Ziffern 9–11 gelten zusätzlich, '
-       + 'wenn der Käufer ein Fahrzeughändler oder eine Garage ist.</div>';
-  const teil = (liste) => liste.forEach(c => {
+  AGB_ALLE.forEach(c => {
     out += '<div class="cl">' + c[0] + '\u2002' + c[1] + '</div>';
     c[2].forEach(t => out += '<div class="cltxt">' + t + '</div>');
   });
-  teil(AGB_ALLE);
-  out += '<div class="sec" style="margin-top:16pt">ZUSÄTZLICH BEI VERKAUF AN FAHRZEUGHÄNDLER / GARAGE</div>';
-  teil(AGB_HAENDLER);
   return out;
 }
 
