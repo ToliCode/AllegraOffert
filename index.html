@@ -211,7 +211,7 @@ DOC_STYLE_PLACEHOLDER
       </div>
       <div class="block">
         <label for="intro">Text über der Fahrzeugtabelle</label>
-        <textarea id="intro" rows="4">Allegra Herr [Name]
+        <textarea id="intro" rows="4">Allegra Herr Name
 
 Wir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende Angebot.</textarea>
       </div>
@@ -611,10 +611,10 @@ function downloadWord(){
 
 /* ===== Anschreiben ===== */
 const ANREDEN = {
-  sieH: 'Allegra Herr [Name]\n\nWir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende Angebot.',
-  sieF: 'Allegra Frau [Name]\n\nWir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende Angebot.',
-  du:   'Allegra [Name]\n\nWir danken dir für dein Interesse. Gerne unterbreiten wir dir das folgende Angebot.',
-  ihr:  'Allegra [Name]\n\nWir danken euch für euer Interesse. Gerne unterbreiten wir euch das folgende Angebot.'
+  sieH: 'Allegra Herr Name\n\nWir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende Angebot.',
+  sieF: 'Allegra Frau Name\n\nWir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende Angebot.',
+  du:   'Allegra Name\n\nWir danken dir für dein Interesse. Gerne unterbreiten wir dir das folgende Angebot.',
+  ihr:  'Allegra Name\n\nWir danken euch für euer Interesse. Gerne unterbreiten wir euch das folgende Angebot.'
 };
 $('anrede').addEventListener('change', () => { $('intro').value = ANREDEN[$('anrede').value]; render(); });
 $('btnTextLeeren').addEventListener('click', () => { $('intro').value = ''; render(); });
