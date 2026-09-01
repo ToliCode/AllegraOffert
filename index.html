@@ -24,12 +24,27 @@
 [hidden]{display:none !important}
 
 /* ---------- Umschaltung ---------- */
-.tabs{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:26px;
+.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:16px;height:49px;
   background:var(--paper);border-bottom:1px solid var(--hair);padding:0 22px}
-.tabs .mark{font-size:13px;font-weight:700;color:var(--akzent);letter-spacing:.14em;margin-right:4px}
-.tabs button{border:0;background:none;padding:15px 0;font-size:12px;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--muted);border-bottom:2px solid transparent;border-radius:0}
-.tabs button[aria-selected="true"]{color:var(--akzent);border-bottom-color:var(--akzent)}
+.topbar .mark{font-size:13px;font-weight:700;color:var(--akzent);letter-spacing:.14em}
+.topbar .titel{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.topbar .trenner{color:var(--hair)}
+.zurueck{border:1px solid var(--hair);background:none;color:var(--ink);
+  font-size:12px;padding:7px 13px;border-radius:2px}
+.zurueck:hover{border-color:var(--akzent);color:var(--akzent)}
+
+/* ---------- Startseite ---------- */
+.startwrap{max-width:660px;margin:0 auto;padding:56px 22px 80px}
+.starttitel{font-size:26px;font-weight:700;letter-spacing:.14em;color:var(--akzent);margin:0}
+.startsub{font-size:13.5px;color:var(--muted);margin:8px 0 30px}
+.kacheln{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kachel{display:block;text-align:left;background:var(--paper);border:1px solid var(--hair);
+  border-left:3px solid var(--hair);border-radius:2px;padding:18px 18px 16px;cursor:pointer}
+.kachel:hover{border-color:var(--akzent);border-left-color:var(--akzent)}
+.kachel .kt{display:block;font-size:15px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.kachel .kd{display:block;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.startfuss{margin-top:26px;padding-top:12px;border-top:1px solid var(--hair);
+  font-size:12px;color:var(--muted)}
 
 /* ---------- Rechner ---------- */
 .calcwrap{display:flex;justify-content:center;padding:34px 22px 40px}
@@ -128,9 +143,14 @@ DOC_STYLE_PLACEHOLDER
   .bar button{flex:1}
   .bar{padding-left:16px;padding-right:16px}
 }
+@media (max-width:640px){
+  .kacheln{grid-template-columns:1fr}
+  .startwrap{padding:34px 16px 70px}
+  .starttitel{font-size:22px}
+}
 @media (max-width:430px){
-  .tabs{gap:18px;padding:0 16px}
-  .tabs .mark{display:none}
+  .topbar{gap:12px;padding:0 16px}
+  .topbar .mark,.topbar .trenner{display:none}
   .calcwrap{padding:24px 16px 40px}
 }
 @media (max-width:520px){
@@ -139,7 +159,7 @@ DOC_STYLE_PLACEHOLDER
 }
 @media print{
   html,body{background:#fff;overflow:visible}
-  .panel,.bar,.stagehead,.tabs,#view-rechner{display:none!important}
+  .panel,.bar,.stagehead,.topbar,#view-rechner,#view-start{display:none!important}
   .app,.stage{display:block;padding:0;margin:0}
   .sheetbox{overflow:visible;width:auto!important;height:auto!important;margin:0}
   .sheetwrap{transform:none!important;width:auto!important}
@@ -153,12 +173,38 @@ DOC_STYLE_PLACEHOLDER
 </head>
 <body>
 
-<nav class="tabs">
+<header class="topbar">
+  <button class="zurueck" id="btnZurueck" hidden>Zurück</button>
   <span class="mark">ALLEGRA AUTO</span>
-  <button id="tabRechner" aria-selected="true">Rechner</button>
-  <button id="tabOfferte" aria-selected="false">Offerte</button>
-  <button id="tabVertrag" aria-selected="false">Kaufvertrag</button>
-</nav>
+  <span class="trenner" id="topTrenner" hidden>·</span>
+  <span class="titel" id="topTitel"></span>
+</header>
+
+<section class="view" id="view-start">
+  <div class="startwrap">
+    <div class="starttitel">ALLEGRA AUTO</div>
+    <p class="startsub">Was möchtest du erstellen?</p>
+    <div class="kacheln">
+      <button class="kachel" data-ziel="rechner">
+        <span class="kt">Preisrechner</span>
+        <span class="kd">Nettopreis aus Deutschland in einen Franken-Zielpreis umrechnen</span>
+      </button>
+      <button class="kachel" data-ziel="offerte">
+        <span class="kt">Offerte</span>
+        <span class="kd">Angebot für einen Kunden, mit Ausstattung und Rabatt</span>
+      </button>
+      <button class="kachel" data-ziel="vertrag">
+        <span class="kt">Kaufvertrag</span>
+        <span class="kd">Zwei Seiten, für Privatkunden und für Händler</span>
+      </button>
+      <button class="kachel" data-ziel="rechnung">
+        <span class="kt">Rechnung</span>
+        <span class="kd">Für Fahrzeugverkauf oder für eine Überführung</span>
+      </button>
+    </div>
+    <div class="startfuss" id="startStatus"></div>
+  </div>
+</section>
 
 <section class="view" id="view-rechner">
   <div class="calcwrap">
@@ -454,6 +500,106 @@ Wir danken Ihnen für Ihr Interesse daran, bei uns ein Fahrzeug zu kaufen. Gerne
 </div>
 </section>
 
+
+<section class="view" id="view-rechnung" hidden>
+<div class="app">
+  <aside class="panel">
+    <p class="sub">Rechnung nach dem Verkauf. Eigene Nummernreihe.</p>
+
+    <div class="warn" id="fWarn" hidden></div>
+
+    <div class="ablage">
+      <div class="row"><label for="fListe">Gespeichert</label>
+        <select id="fListe"><option value="">— nichts gespeichert —</option></select>
+      </div>
+      <div class="ablagebtns">
+        <button class="linkbtn" id="fSichern">Sichern</button>
+        <button class="linkbtn" id="fLaden">Laden</button>
+        <button class="linkbtn" id="fLoeschen">Löschen</button>
+        <button class="linkbtn" id="fNeu">Neu</button>
+      </div>
+      <div class="hinweis" id="fHinweis"></div>
+    </div>
+
+    <div class="linkrow"><button class="linkbtn" id="btnAusVertrag">Daten aus Kaufvertrag übernehmen</button></div>
+
+    <fieldset>
+      <legend>Rechnung</legend>
+      <div class="pair">
+        <div class="row"><label for="fNr">Nummer</label><input id="fNr" placeholder="100"></div>
+        <div class="row"><label for="fDatum">Datum</label><input id="fDatum" type="date"></div>
+      </div>
+      <div class="row"><label for="fArt">Art</label>
+        <select id="fArt">
+          <option value="verkauf" selected>Fahrzeugverkauf</option>
+          <option value="ueberfuehrung">Überführung</option>
+        </select>
+      </div>
+      <div class="row"><label for="fVertragNr">Zu Vertrag Nr.</label><input id="fVertragNr" placeholder="optional"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Kunde</legend>
+      <div class="row"><label for="fName">Name / Firma</label><input id="fName"></div>
+      <div class="row"><label for="fStrasse">Strasse Nr.</label><input id="fStrasse"></div>
+      <div class="row"><label for="fOrt">PLZ / Ort</label><input id="fOrt"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Leistung</legend>
+      <div class="row"><label for="fMarke">Marke / Typ</label><input id="fMarke"></div>
+      <div class="row"><label for="fVin">Chassis-Nr.</label><input id="fVin"></div>
+      <div class="row" id="rowInverkehr"><label for="fInverkehr">1. Inverkehr.</label><input id="fInverkehr"></div>
+      <div class="pair" id="rowStrecke">
+        <div class="row"><label for="fVon">Von</label><input id="fVon" placeholder="München"></div>
+        <div class="row"><label for="fNach">Nach</label><input id="fNach" placeholder="Chur"></div>
+      </div>
+      <div class="row" id="rowUeDatum"><label for="fUeDatum">Überführt am</label><input id="fUeDatum"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Positionen</legend>
+      <div class="row"><label for="fPreis" id="lblPreis">Fahrzeug</label><input id="fPreis" inputmode="decimal"></div>
+      <div class="row" id="rowAblieferung"><label for="fUeber">Ablieferung</label><input id="fUeber" inputmode="decimal"></div>
+      <div class="row"><label for="fPosText">Weitere Position</label><input id="fPosText" placeholder="Bezeichnung"></div>
+      <div class="row"><label for="fPosBetrag">Betrag dazu</label><input id="fPosBetrag" inputmode="decimal"></div>
+      <div class="row" id="rowEintausch"><label for="fEintausch">Eintausch −</label><input id="fEintausch" inputmode="decimal"></div>
+      <div class="row"><label for="fAnzahlung">Anzahlung −</label><input id="fAnzahlung" inputmode="decimal"></div>
+      <div class="row"><label for="fMwst">MWST</label>
+        <select id="fMwst">
+          <option value="inkl" selected>inkl. 8.1% MWST</option>
+          <option value="exkl">exkl., 8.1% separat</option>
+          <option value="keine">keine MWST</option>
+        </select>
+      </div>
+      <div class="total"><span>Zu zahlen</span><b id="fTotalOut">CHF 0.00</b></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Zahlung</legend>
+      <div class="row"><label for="fFrist">Zahlbar bis</label><input id="fFrist" placeholder="innert 10 Tagen"></div>
+      <div class="row"><label for="fBank">Bankverbindung</label><input id="fBank" value="[Bankname], IBAN CH__ ____ ____ ____ ____ _"></div>
+      <div class="block">
+        <label for="fBem">Bemerkung</label>
+        <textarea id="fBem" rows="2"></textarea>
+      </div>
+    </fieldset>
+  </aside>
+
+  <main class="stage" id="stage-f">
+    <div class="stagehead">
+      <span>Vorschau</span>
+      <button class="zoom" id="btnZoom-f">Originalgrösse</button>
+    </div>
+    <div class="sheetbox" id="sheetbox-f">
+      <div class="sheetwrap" id="sheetwrap-f">
+        <div class="sheet"><div class="doc" id="docF"></div><div class="sheetfoot">Allegra Auto GmbH &nbsp;·&nbsp; Guflis 8 &nbsp;·&nbsp; 7204 Untervaz &nbsp;·&nbsp; 078 707 43 61 &nbsp;·&nbsp; info@allegra-auto.ch</div></div>
+      </div>
+    </div>
+  </main>
+</div>
+</section>
+
 <div class="bar" id="bar" hidden>
   <button class="ghost" id="btnWord">Word herunterladen</button>
   <button class="primary" id="btnPrint">Drucken / PDF</button>
@@ -617,7 +763,7 @@ function buildDoc(){
 function render(){ $('doc').innerHTML = buildDoc(); fit(); warnZeigen('o'); autoSichern('o'); }
 
 /* ===== Vorschau einpassen ===== */
-const Z = { o: false, v: false };
+const Z = { o: false, v: false, f: false };
 function fitView(k){
   const stage = $('stage-' + k), box = $('sheetbox-' + k), wrap = $('sheetwrap-' + k);
   const cs = getComputedStyle(stage);
@@ -660,7 +806,7 @@ function downloadWord(){
 }
 
 /* ===== Ablage ===== */
-const ANSICHT = { o: 'view-offerte', v: 'view-vertrag', r: 'view-rechner' };
+const ANSICHT = { o: 'view-offerte', v: 'view-vertrag', f: 'view-rechnung', r: 'view-rechner' };
 
 const S = {
   frei: (function(){ try { localStorage.setItem('aa.t','1'); localStorage.removeItem('aa.t'); return true; }
@@ -715,8 +861,8 @@ const SRV = {
     return j;
   }
 };
-const ART = { o: 'offerte', v: 'vertrag' };
-const NRFELD = { o: 'nr', v: 'vNr' };
+const ART = { o: 'offerte', v: 'vertrag', f: 'rechnung' };
+const NRFELD = { o: 'nr', v: 'vNr', f: 'fNr' };
 
 function srvMelden(text){ $('srvHinweis').textContent = text; }
 
@@ -728,7 +874,7 @@ $('srvPruefen').addEventListener('click', async () => {
   try {
     await SRV.ruf({ aktion: 'test' });
     srvMelden('Verbunden. Sichern und Laden laufen jetzt über die Tabelle.');
-    await listeFuellen('o'); await listeFuellen('v');
+    await listeFuellen('o'); await listeFuellen('v'); await listeFuellen('f');
   } catch(e){
     srvMelden('Nicht erreichbar: ' + e.message);
   }
@@ -738,7 +884,7 @@ $('srvTrennen').addEventListener('click', () => {
   S.weg('aa.url');
   $('srvUrl').value = '';
   srvMelden('Getrennt. Es wird nur noch auf diesem Gerät gespeichert.');
-  listeFuellen('o'); listeFuellen('v');
+  listeFuellen('o'); listeFuellen('v'); listeFuellen('f');
 });
 
 async function listeFuellen(k){
@@ -777,12 +923,12 @@ async function naechsteNr(k){
   return naechsteNrLokal(k);
 }
 
-function zeichnen(k){ (k === 'o' ? render : renderVertrag)(); }
+function zeichnen(k){ (k === 'o' ? render : k === 'v' ? renderVertrag : renderRechnung)(); }
 
 async function sichern(k){
   const daten = lesenFelder(k);
   const nr = $(NRFELD[k]).value.trim();
-  const name = (k === 'o' ? $('kName') : $('vName')).value.trim();
+  const name = $(k === 'o' ? 'kName' : k === 'v' ? 'vName' : 'fName').value.trim();
 
   if (S.frei){
     const titel = (nr || 'ohne Nr.') + ' · ' + (name || 'ohne Name');
@@ -851,13 +997,14 @@ async function neu(k){
   const nr = await naechsteNr(k);
   setzenFelder(k, STANDARD[k]);
   if (k === 'o') $('datum').value = HEUTE;
+  if (k === 'f') $('fDatum').value = HEUTE;
   $(NRFELD[k]).value = nr;
   $(k + 'Liste').value = '';
   zeichnen(k);
   melden(k, 'Neues Dokument, Nr. ' + nr);
 }
 
-['o', 'v'].forEach(k => {
+['o', 'v', 'f'].forEach(k => {
   $(k + 'Sichern').addEventListener('click', () => sichern(k));
   $(k + 'Laden').addEventListener('click', () => laden(k));
   $(k + 'Loeschen').addEventListener('click', () => loeschen(k));
@@ -872,6 +1019,14 @@ function warnungen(k){
     if (/(^|\s)Name(\s|$)/.test($('intro').value)) w.push('Im Anschreiben steht noch «Name»');
     if (!$('marke').value.trim()) w.push('Marke / Typ fehlt');
     if (num($('preis').value) <= 0) w.push('Fahrzeugpreis fehlt');
+  } else if (k === 'f'){
+    if (!$('fName').value.trim()) w.push('Kundenname fehlt');
+    if (!$('fMarke').value.trim()) w.push('Marke / Typ fehlt');
+    if (num($('fPreis').value) <= 0) w.push('Betrag fehlt');
+    if ($('fArt').value === 'ueberfuehrung' && !($('fVon').value.trim() && $('fNach').value.trim()))
+      w.push('Strecke von / nach fehlt');
+    if (!$('fFrist').value.trim()) w.push('Zahlungsfrist fehlt');
+    if ($('fBank').value.indexOf('[Bankname]') >= 0) w.push('Bankverbindung ist noch der Platzhalter');
   } else {
     if (!$('vName').value.trim()) w.push('Name / Firma fehlt');
     if (!$('vMarke').value.trim()) w.push('Marke / Typ fehlt');
@@ -1102,6 +1257,173 @@ function wordVertrag(){
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
 }
 
+/* ===== Rechnung ===== */
+function fPreise(){
+  const preis = num($('fPreis').value), ueber = num($('fUeber').value);
+  const pos = num($('fPosBetrag').value), eint = num($('fEintausch').value);
+  const anz = num($('fAnzahlung').value);
+  const art = $('fMwst').value;
+  const netto = preis + ueber + pos;
+  const mwst = art === 'exkl' ? netto * 0.081 : 0;
+  const total = netto + mwst - eint;
+  return { preis, ueber, pos, eint, anz, art, mwst, total, rest: total - anz };
+}
+
+function buildRechnung(){
+  const g = id => $(id).value.trim();
+  const nr = g('fNr');
+  const kunde = [g('fName'), g('fStrasse'), g('fOrt')].filter(Boolean);
+  let out = '';
+
+  out += '<table><tr>'
+      + '<td style="width:10.6cm"><div class="firm">Allegra Auto GmbH</div></td>'
+      + '<td style="width:6.4cm" class="rt">'
+      + '<div class="meta">Rechnung Nr. ' + (nr ? esc(nr) : '__________') + '</div>'
+      + '<div class="meta">UID &nbsp;CHE-320.630.565</div>'
+      + '</td></tr></table>';
+  out += '<table><tr><td class="rule"></td></tr></table>';
+
+  out += '<table class="addr"><tr><td style="width:12.5cm"></td><td style="width:4.5cm">'
+      + '<div class="tiny">Kunde</div>'
+      + (kunde.length ? kunde.map(l => '<div>' + esc(l) + '</div>').join('') : '<div>&nbsp;</div>')
+      + '</td></tr></table>';
+  out += '<table class="datum"><tr><td style="width:12.5cm"></td><td style="width:4.5cm">'
+      + esc(dateDE(g('fDatum'))) + '</td></tr></table>';
+
+  out += '<div class="title">Rechnung</div>';
+  if (g('fVertragNr'))
+    out += '<div class="intro">Zu unserem Kaufvertrag Nr. ' + esc(g('fVertragNr')) + '</div>';
+
+  const transport = $('fArt').value === 'ueberfuehrung';
+  const fz = [];
+  const zu = (k, v) => { if (v) fz.push([k, v]); };
+  zu('Marke / Typ', g('fMarke'));
+  zu('Chassis-Nr. (VIN)', g('fVin'));
+  if (transport){
+    zu('Von', g('fVon'));
+    zu('Nach', g('fNach'));
+    zu('Überführt am', g('fUeDatum'));
+  } else {
+    zu('1. Inverkehrsetzung', g('fInverkehr'));
+  }
+  if (fz.length){
+    out += '<div class="sec">' + (transport ? 'ÜBERFÜHRUNG' : 'FAHRZEUG') + '</div><table class="grid">';
+    for (let i = 0; i < fz.length; i += 2){
+      out += '<tr>'
+        + '<td class="k" style="width:3.7cm">' + esc(fz[i][0]) + '</td>'
+        + '<td class="v" style="width:4.8cm">' + esc(fz[i][1]) + '</td>'
+        + (fz[i+1]
+            ? '<td class="k" style="width:3.7cm">' + esc(fz[i+1][0]) + '</td>'
+              + '<td class="v" style="width:4.8cm">' + esc(fz[i+1][1]) + '</td>'
+            : '<td class="blank" colspan="2"></td>')
+        + '</tr>';
+    }
+    out += '</table>';
+  }
+
+  const P = fPreise();
+  const abzug = n => 'CHF – ' + n.toLocaleString('de-CH', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  let posEins;
+  if (transport){
+    const strecke = [g('fVon'), g('fNach')].filter(Boolean).join(' – ');
+    posEins = 'Überführung' + (g('fMarke') ? ' ' + esc(g('fMarke')) : '')
+            + (strecke ? ', ' + esc(strecke) : '');
+  } else {
+    posEins = 'Fahrzeug' + (g('fMarke') ? ' ' + esc(g('fMarke')) : '');
+  }
+  if (P.art === 'inkl') posEins += ' inkl. 8.1% MWST';
+
+  out += '<div class="sec">POSITIONEN</div><table class="price">';
+  out += '<tr><td style="width:12.1cm">' + posEins
+       + '</td><td class="a" style="width:4.9cm">' + chf(P.preis) + '</td></tr>';
+  if (P.ueber) out += '<tr><td>Ablieferungspauschale</td><td class="a">' + chf(P.ueber) + '</td></tr>';
+  if (P.pos || g('fPosText'))
+    out += '<tr><td>' + esc(g('fPosText') || 'Weitere Position') + '</td><td class="a">' + chf(P.pos) + '</td></tr>';
+  if (P.art === 'exkl') out += '<tr><td>MWST 8.1 %</td><td class="a">' + chf(P.mwst) + '</td></tr>';
+  if (P.eint) out += '<tr><td>Eintauschfahrzeug (Abzug)</td><td class="a">' + abzug(P.eint) + '</td></tr>';
+
+  if (P.anz){
+    out += '<tr><td>Total</td><td class="a">' + chf(P.total) + '</td></tr>';
+    out += '<tr><td>Anzahlung (Abzug)</td><td class="a">' + abzug(P.anz) + '</td></tr>';
+    out += '<tr class="sum"><td>Restbetrag</td><td class="a">' + chf(P.rest) + '</td></tr>';
+  } else {
+    out += '<tr class="sum"><td>Rechnungsbetrag</td><td class="a">' + chf(P.total) + '</td></tr>';
+  }
+  out += '</table>';
+  $('fTotalOut').textContent = chf(P.rest);
+
+  out += '<div style="height:8pt"></div>';
+  out += '<table class="grid">'
+      + '<tr><td class="k" style="width:3.7cm">Zahlbar bis</td><td class="v" colspan="3">'
+      + esc(g('fFrist') || '____________________') + '</td></tr>'
+      + '<tr><td class="k" style="width:3.7cm">Bankverbindung</td><td class="v" colspan="3">'
+      + esc(g('fBank')) + '</td></tr></table>';
+
+  const bem = g('fBem');
+  if (bem){
+    out += '<div class="sec">BEMERKUNG</div>';
+    bem.split('\n').forEach(l => { if (l.trim()) out += '<div class="cltxt">' + esc(l) + '</div>'; });
+  }
+
+  out += '<div class="greet">Freundliche Grüsse</div><div class="greet2">Allegra Auto</div>';
+  return out;
+}
+
+function fArtFelder(){
+  const transport = $('fArt').value === 'ueberfuehrung';
+  $('rowInverkehr').hidden = transport;
+  $('rowStrecke').hidden = !transport;
+  $('rowUeDatum').hidden = !transport;
+  $('rowAblieferung').hidden = transport;
+  $('rowEintausch').hidden = transport;
+  $('lblPreis').textContent = transport ? 'Überführung' : 'Fahrzeug';
+}
+
+function renderRechnung(){
+  fArtFelder();
+  $('docF').innerHTML = buildRechnung();
+  fitView('f');
+  warnZeigen('f');
+  autoSichern('f');
+}
+
+document.querySelectorAll('#view-rechnung input, #view-rechnung select, #view-rechnung textarea').forEach(el => {
+  el.addEventListener('input', renderRechnung);
+  el.addEventListener('change', renderRechnung);
+});
+
+$('btnAusVertrag').addEventListener('click', () => {
+  const paare = [['vName','fName'],['vStrasse','fStrasse'],['vOrt','fOrt'],['vMarke','fMarke'],
+    ['vVin','fVin'],['vInverkehr','fInverkehr'],['vPreis','fPreis'],
+    ['vUeber','fUeber'],['vEintausch','fEintausch'],['vMwst','fMwst'],['vBank','fBank'],['vNr','fVertragNr']];
+  paare.forEach(([a, b]) => { if ($(a).value) $(b).value = $(a).value; });
+  renderRechnung();
+});
+
+function wordRechnung(){
+  const html =
+'<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'
++ '<head><meta charset="utf-8"><style>'
++ '@page Section1 { size:21cm 29.7cm; margin:1.8cm 2cm 1.6cm 2cm; mso-footer:f1; }'
++ 'div.Section1 { page:Section1; }'
++ '.foot { font-family:Arial,sans-serif; font-size:7.5pt; color:#5F5F5F; border-top:.5pt solid #000000; padding-top:4pt; text-align:center; }'
++ DOC_CSS
++ '</style></head><body><div class="Section1"><div class="doc">' + buildRechnung() + '</div></div>'
++ '<div style="mso-element:footer" id="f1"><p class="foot">Allegra Auto GmbH &nbsp;·&nbsp; Guflis 8 &nbsp;·&nbsp; 7204 Untervaz &nbsp;·&nbsp; 078 707 43 61 &nbsp;·&nbsp; info@allegra-auto.ch</p></div>'
++ '</body></html>';
+
+  const kunde = $('fName').value.trim().replace(/[^\wäöüÄÖÜß -]/g, '').replace(/\s+/g, '-');
+  const name = ['Rechnung', kunde || $('fNr').value.trim() || 'Entwurf',
+                new Date().toISOString().slice(0,10)].filter(Boolean).join('_') + '.doc';
+  const blob = new Blob(['\ufeff' + html], {type:'application/msword'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
 /* ===== Preisrechner ===== */
 function calcRender(){
   const eur = num($('eur').value), fx = num($('fx').value),
@@ -1123,23 +1445,31 @@ $('toggleAdv').addEventListener('click', () => {
 });
 
 /* ===== Umschaltung Rechner / Offerte ===== */
-let aktiv = 'rechner';
+let aktiv = 'start';
+const SCHLUESSEL = { offerte: 'o', vertrag: 'v', rechnung: 'f' };
+const TITEL = { rechner: 'Preisrechner', offerte: 'Offerte', vertrag: 'Kaufvertrag', rechnung: 'Rechnung' };
+
 function showView(name){
   aktiv = name;
-  $('view-rechner').hidden = name !== 'rechner';
-  $('view-offerte').hidden = name !== 'offerte';
-  $('view-vertrag').hidden = name !== 'vertrag';
-  $('bar').hidden = name === 'rechner';
-  $('tabRechner').setAttribute('aria-selected', String(name === 'rechner'));
-  $('tabOfferte').setAttribute('aria-selected', String(name === 'offerte'));
-  $('tabVertrag').setAttribute('aria-selected', String(name === 'vertrag'));
-  if (name === 'offerte') fitView('o');
-  if (name === 'vertrag') fitView('v');
+  ['start', 'rechner', 'offerte', 'vertrag', 'rechnung'].forEach(n => {
+    $('view-' + n).hidden = n !== name;
+  });
+  const start = name === 'start';
+  $('bar').hidden = start || name === 'rechner';
+  $('btnZurueck').hidden = start;
+  $('topTrenner').hidden = start;
+  $('topTitel').textContent = start ? '' : (TITEL[name] || '');
+  if (start) $('startStatus').textContent = SRV.aktiv()
+    ? 'Gemeinsame Ablage verbunden.'
+    : 'Ohne gemeinsame Ablage – es wird nur auf diesem Gerät gespeichert.';
+  if (SCHLUESSEL[name]) fitView(SCHLUESSEL[name]);
   window.scrollTo(0, 0);
 }
-$('tabRechner').addEventListener('click', () => showView('rechner'));
-$('tabOfferte').addEventListener('click', () => showView('offerte'));
-$('tabVertrag').addEventListener('click', () => showView('vertrag'));
+
+document.querySelectorAll('.kachel').forEach(k => {
+  k.addEventListener('click', () => showView(k.getAttribute('data-ziel')));
+});
+$('btnZurueck').addEventListener('click', () => showView('start'));
 
 /* ===== Start ===== */
 document.querySelectorAll('.panel input, .panel select, .panel textarea').forEach(el => {
@@ -1150,22 +1480,24 @@ $('mwstLbl').addEventListener('click', () => { $('mwst').checked = !$('mwst').ch
 $('kwBothLbl').addEventListener('click', () => { $('kwBoth').checked = !$('kwBoth').checked; render(); });
 $('btnZoom-o').addEventListener('click', () => { Z.o = !Z.o; fitView('o'); });
 $('btnZoom-v').addEventListener('click', () => { Z.v = !Z.v; fitView('v'); });
+$('btnZoom-f').addEventListener('click', () => { Z.f = !Z.f; fitView('f'); });
 $('btnPrint').addEventListener('click', () => {
-  if (freigegeben(aktiv === 'vertrag' ? 'v' : 'o')) window.print();
+  if (freigegeben(SCHLUESSEL[aktiv] || 'o')) window.print();
 });
 $('btnWord').addEventListener('click', () => {
-  const k = aktiv === 'vertrag' ? 'v' : 'o';
+  const k = SCHLUESSEL[aktiv] || 'o';
   if (!freigegeben(k)) return;
-  if (k === 'v') wordVertrag(); else downloadWord();
+  if (k === 'v') wordVertrag(); else if (k === 'f') wordRechnung(); else downloadWord();
 });
-window.addEventListener('resize', () => { fitView('o'); fitView('v'); });
-window.addEventListener('load', () => { fitView('o'); fitView('v'); });
+window.addEventListener('resize', () => { fitView('o'); fitView('v'); fitView('f'); });
+window.addEventListener('load', () => { fitView('o'); fitView('v'); fitView('f'); });
 
 const HEUTE = new Date().toISOString().slice(0,10);
 $('datum').value = HEUTE;
-const STANDARD = { o: lesenFelder('o'), v: lesenFelder('v') };
+$('fDatum').value = HEUTE;
+const STANDARD = { o: lesenFelder('o'), v: lesenFelder('v'), f: lesenFelder('f') };
 
-['o', 'v', 'r'].forEach(k => {
+['o', 'v', 'f', 'r'].forEach(k => {
   const d = S.lesen('aa.' + k + '.jetzt', null);
   if (d) setzenFelder(k, d);
   if (k !== 'r') listeFuellen(k);
@@ -1177,7 +1509,8 @@ if (!$('datum').value) $('datum').value = HEUTE;
 render();
 calcRender();
 renderVertrag();
-showView('rechner');
+renderRechnung();
+showView('start');
 
 /* ===== Als App installierbar / offline ===== */
 if ('serviceWorker' in navigator) {
