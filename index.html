@@ -248,7 +248,7 @@ DOC_STYLE_PLACEHOLDER
         <label for="intro">Text über der Fahrzeugtabelle</label>
         <textarea id="intro" rows="4">Allegra Herr Name
 
-Wir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende Angebot.</textarea>
+Wir danken Ihnen für Ihr Interesse daran, bei uns ein Fahrzeug zu kaufen. Gerne unterbreiten wir Ihnen die folgende Offerte.</textarea>
       </div>
       <div class="linkrow"><button class="linkbtn" id="btnTextLeeren">Text leeren</button></div>
     </fieldset>
@@ -897,10 +897,10 @@ function freigegeben(k){
 
 /* ===== Anschreiben ===== */
 const ANREDEN = {
-  sieH: 'Allegra Herr Name\n\nWir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende Angebot.',
-  sieF: 'Allegra Frau Name\n\nWir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende Angebot.',
-  du:   'Allegra Name\n\nWir danken dir für dein Interesse. Gerne unterbreiten wir dir das folgende Angebot.',
-  ihr:  'Allegra Name\n\nWir danken euch für euer Interesse. Gerne unterbreiten wir euch das folgende Angebot.'
+  sieH: 'Allegra Herr Name\n\nWir danken Ihnen für Ihr Interesse daran, bei uns ein Fahrzeug zu kaufen. Gerne unterbreiten wir Ihnen die folgende Offerte.',
+  sieF: 'Allegra Frau Name\n\nWir danken Ihnen für Ihr Interesse daran, bei uns ein Fahrzeug zu kaufen. Gerne unterbreiten wir Ihnen die folgende Offerte.',
+  du:   'Allegra Name\n\nWir danken dir für dein Interesse daran, bei uns ein Fahrzeug zu kaufen. Gerne unterbreiten wir dir die folgende Offerte.',
+  ihr:  'Allegra Name\n\nWir danken euch für euer Interesse daran, bei uns ein Fahrzeug zu kaufen. Gerne unterbreiten wir euch die folgende Offerte.'
 };
 $('anrede').addEventListener('change', () => { $('intro').value = ANREDEN[$('anrede').value]; render(); });
 $('btnTextLeeren').addEventListener('click', () => { $('intro').value = ''; render(); });
