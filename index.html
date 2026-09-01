@@ -106,6 +106,13 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
   padding:1.8cm 2cm 1.6cm;box-shadow:0 2px 20px rgba(0,0,0,.14);position:relative}
 .sheet + .sheet{margin-top:22px}
 .linkrow{padding:0 0 14px}
+.ablage{margin:0 0 18px}
+.ablagebtns{display:flex;gap:16px;flex-wrap:wrap;padding-top:8px}
+.hinweis{font-size:12px;color:var(--muted);padding-top:6px;min-height:15px}
+.warn{border-left:3px solid var(--akzent);background:var(--field);
+  padding:10px 12px;margin:0 0 18px;font-size:12.5px;line-height:1.45}
+.warn ul{margin:5px 0 0;padding-left:17px}
+.warn li{margin:2px 0}
 
 /* ---------- Dokument (identisch für Vorschau und Word) ---------- */
 DOC_STYLE_PLACEHOLDER
@@ -175,6 +182,19 @@ DOC_STYLE_PLACEHOLDER
         <div class="calcres-value" id="calcOut">CHF 0.00</div>
         <div class="calcbreak" id="calcBreak"></div>
       </div>
+
+      <fieldset style="margin-top:26px">
+        <legend>Gemeinsame Ablage</legend>
+        <div class="block">
+          <label for="srvUrl">Adresse der Google-Tabelle</label>
+          <textarea id="srvUrl" rows="2" placeholder="https://script.google.com/macros/s/…/exec"></textarea>
+        </div>
+        <div class="ablagebtns">
+          <button class="linkbtn" id="srvPruefen">Verbindung prüfen</button>
+          <button class="linkbtn" id="srvTrennen">Trennen</button>
+        </div>
+        <div class="hinweis" id="srvHinweis">Ohne Adresse wird nur auf diesem Gerät gespeichert.</div>
+      </fieldset>
     </div>
   </div>
 </section>
@@ -183,6 +203,21 @@ DOC_STYLE_PLACEHOLDER
 <div class="app">
   <aside class="panel">
     <p class="sub">Angaben ausfüllen – die Offerte entsteht daneben. Leere Felder werden weggelassen.</p>
+
+    <div class="warn" id="oWarn" hidden></div>
+
+    <div class="ablage">
+      <div class="row"><label for="oListe">Gespeichert</label>
+        <select id="oListe"><option value="">— nichts gespeichert —</option></select>
+      </div>
+      <div class="ablagebtns">
+        <button class="linkbtn" id="oSichern">Sichern</button>
+        <button class="linkbtn" id="oLaden">Laden</button>
+        <button class="linkbtn" id="oLoeschen">Löschen</button>
+        <button class="linkbtn" id="oNeu">Neu</button>
+      </div>
+      <div class="hinweis" id="oHinweis"></div>
+    </div>
 
     <fieldset>
       <legend>Offerte</legend>
@@ -291,6 +326,21 @@ Wir danken Ihnen für Ihr Interesse. Gerne unterbreiten wir Ihnen das folgende A
 <div class="app">
   <aside class="panel">
     <p class="sub">Kaufvertrag ausfüllen. Der Vertrag umfasst zwei Seiten.</p>
+
+    <div class="warn" id="vWarn" hidden></div>
+
+    <div class="ablage">
+      <div class="row"><label for="vListe">Gespeichert</label>
+        <select id="vListe"><option value="">— nichts gespeichert —</option></select>
+      </div>
+      <div class="ablagebtns">
+        <button class="linkbtn" id="vSichern">Sichern</button>
+        <button class="linkbtn" id="vLaden">Laden</button>
+        <button class="linkbtn" id="vLoeschen">Löschen</button>
+        <button class="linkbtn" id="vNeu">Neu</button>
+      </div>
+      <div class="hinweis" id="vHinweis"></div>
+    </div>
 
     <div class="linkrow"><button class="linkbtn" id="btnUebernehmen">Daten aus Offerte übernehmen</button></div>
 
@@ -564,7 +614,7 @@ function buildDoc(){
   return out;
 }
 
-function render(){ $('doc').innerHTML = buildDoc(); fit(); }
+function render(){ $('doc').innerHTML = buildDoc(); fit(); warnZeigen('o'); autoSichern('o'); }
 
 /* ===== Vorschau einpassen ===== */
 const Z = { o: false, v: false };
@@ -607,6 +657,242 @@ function downloadWord(){
   a.download = name;
   document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
+/* ===== Ablage ===== */
+const ANSICHT = { o: 'view-offerte', v: 'view-vertrag', r: 'view-rechner' };
+
+const S = {
+  frei: (function(){ try { localStorage.setItem('aa.t','1'); localStorage.removeItem('aa.t'); return true; }
+                     catch(e){ return false; } })(),
+  lesen(k, ersatz){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : ersatz; }
+                    catch(e){ return ersatz; } },
+  schreiben(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } },
+  weg(k){ try { localStorage.removeItem(k); } catch(e){} }
+};
+
+function felder(k){
+  return Array.from(document.querySelectorAll(
+    '#' + ANSICHT[k] + ' input, #' + ANSICHT[k] + ' select, #' + ANSICHT[k] + ' textarea'));
+}
+function lesenFelder(k){
+  const o = {};
+  felder(k).forEach(e => { if (e.id) o[e.id] = e.type === 'checkbox' ? e.checked : e.value; });
+  return o;
+}
+function setzenFelder(k, o){
+  felder(k).forEach(e => {
+    if (!e.id || !(e.id in o)) return;
+    if (e.type === 'checkbox') e.checked = !!o[e.id]; else e.value = o[e.id];
+  });
+}
+
+let sicherTimer = {};
+function autoSichern(k){
+  if (!S.frei) return;
+  clearTimeout(sicherTimer[k]);
+  sicherTimer[k] = setTimeout(() => S.schreiben('aa.' + k + '.jetzt', lesenFelder(k)), 400);
+}
+
+function melden(k, text){
+  const el = $(k + 'Hinweis');
+  el.textContent = text;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.textContent = ''; }, 3500);
+}
+
+const SRV = {
+  url(){ return S.lesen('aa.url', ''); },
+  aktiv(){ return !!SRV.url(); },
+  async ruf(nutzlast){
+    const u = SRV.url();
+    if (!u) throw new Error('Keine Adresse hinterlegt');
+    const r = await fetch(u, { method: 'POST', body: JSON.stringify(nutzlast), redirect: 'follow' });
+    const text = await r.text();
+    let j;
+    try { j = JSON.parse(text); } catch(e){ throw new Error('Unerwartete Antwort – Adresse prüfen'); }
+    if (!j.ok) throw new Error(j.fehler || 'Fehler in der Tabelle');
+    return j;
+  }
+};
+const ART = { o: 'offerte', v: 'vertrag' };
+const NRFELD = { o: 'nr', v: 'vNr' };
+
+function srvMelden(text){ $('srvHinweis').textContent = text; }
+
+$('srvPruefen').addEventListener('click', async () => {
+  const u = $('srvUrl').value.trim();
+  if (!u) return srvMelden('Bitte zuerst die Adresse einsetzen');
+  S.schreiben('aa.url', u);
+  srvMelden('Wird geprüft …');
+  try {
+    await SRV.ruf({ aktion: 'test' });
+    srvMelden('Verbunden. Sichern und Laden laufen jetzt über die Tabelle.');
+    await listeFuellen('o'); await listeFuellen('v');
+  } catch(e){
+    srvMelden('Nicht erreichbar: ' + e.message);
+  }
+});
+
+$('srvTrennen').addEventListener('click', () => {
+  S.weg('aa.url');
+  $('srvUrl').value = '';
+  srvMelden('Getrennt. Es wird nur noch auf diesem Gerät gespeichert.');
+  listeFuellen('o'); listeFuellen('v');
+});
+
+async function listeFuellen(k){
+  const sel = $(k + 'Liste');
+  if (SRV.aktiv()){
+    try {
+      const j = await SRV.ruf({ aktion: 'liste', art: ART[k] });
+      const e = j.eintraege || [];
+      sel.innerHTML = '<option value="">' + (e.length ? '— auswählen —' : '— nichts gespeichert —') + '</option>'
+        + e.map(x => '<option value="' + x.nummer + '">' + esc('Nr. ' + x.nummer + ' · ' + (x.kunde || 'ohne Name')) + '</option>').join('');
+      return;
+    } catch(err){ /* fällt unten auf die lokale Liste zurück */ }
+  }
+  const l = S.lesen('aa.' + k + '.liste', {});
+  const namen = Object.keys(l).sort();
+  sel.innerHTML = '<option value="">' + (namen.length ? '— auswählen —' : '— nichts gespeichert —') + '</option>'
+    + namen.map(n => '<option value="' + n.replace(/"/g, '&quot;') + '">' + esc(n) + '</option>').join('');
+}
+
+function naechsteNrLokal(k){
+  const l = S.lesen('aa.' + k + '.liste', {});
+  let hoechste = 99;
+  Object.values(l).forEach(e => {
+    const n = parseInt((e.daten || {})[NRFELD[k]], 10);
+    if (!isNaN(n)) hoechste = Math.max(hoechste, n);
+  });
+  const jetzt = parseInt($(NRFELD[k]).value, 10);
+  if (!isNaN(jetzt)) hoechste = Math.max(hoechste, jetzt);
+  return String(hoechste + 1);
+}
+
+async function naechsteNr(k){
+  if (SRV.aktiv()){
+    try { return String((await SRV.ruf({ aktion: 'naechste', art: ART[k] })).nummer); } catch(e){}
+  }
+  return naechsteNrLokal(k);
+}
+
+function zeichnen(k){ (k === 'o' ? render : renderVertrag)(); }
+
+async function sichern(k){
+  const daten = lesenFelder(k);
+  const nr = $(NRFELD[k]).value.trim();
+  const name = (k === 'o' ? $('kName') : $('vName')).value.trim();
+
+  if (S.frei){
+    const titel = (nr || 'ohne Nr.') + ' · ' + (name || 'ohne Name');
+    const l = S.lesen('aa.' + k + '.liste', {});
+    l[titel] = { zeit: Date.now(), daten: daten };
+    S.schreiben('aa.' + k + '.liste', l);
+  }
+
+  if (!SRV.aktiv()){
+    await listeFuellen(k);
+    return melden(k, S.frei ? 'Auf diesem Gerät gesichert' : 'Speichern in diesem Browser nicht möglich');
+  }
+
+  melden(k, 'Wird in die Tabelle geschrieben …');
+  try {
+    const j = await SRV.ruf({ aktion: 'sichern', art: ART[k], nummer: nr, daten: daten });
+    $(NRFELD[k]).value = j.nummer;
+    zeichnen(k);
+    await listeFuellen(k);
+    $(k + 'Liste').value = String(j.nummer);
+    melden(k, 'Gesichert als Nr. ' + j.nummer);
+  } catch(e){
+    melden(k, 'Tabelle nicht erreichbar – nur auf diesem Gerät gesichert');
+  }
+}
+
+async function laden(k){
+  const wahl = $(k + 'Liste').value;
+  if (!wahl) return melden(k, 'Zuerst einen Eintrag wählen');
+
+  if (SRV.aktiv()){
+    melden(k, 'Wird geladen …');
+    try {
+      const j = await SRV.ruf({ aktion: 'laden', art: ART[k], nummer: wahl });
+      setzenFelder(k, j.daten);
+      zeichnen(k);
+      return melden(k, 'Geladen: Nr. ' + wahl);
+    } catch(e){ return melden(k, 'Nicht erreichbar: ' + e.message); }
+  }
+
+  const l = S.lesen('aa.' + k + '.liste', {});
+  if (!l[wahl]) return melden(k, 'Nicht gefunden');
+  setzenFelder(k, l[wahl].daten);
+  zeichnen(k);
+  melden(k, 'Geladen: ' + wahl);
+}
+
+async function loeschen(k){
+  const wahl = $(k + 'Liste').value;
+  if (!wahl) return melden(k, 'Zuerst einen Eintrag wählen');
+  if (!confirm('Eintrag „' + wahl + '“ löschen?')) return;
+
+  if (SRV.aktiv()){
+    try { await SRV.ruf({ aktion: 'loeschen', art: ART[k], nummer: wahl }); }
+    catch(e){ return melden(k, 'Nicht erreichbar: ' + e.message); }
+  } else {
+    const l = S.lesen('aa.' + k + '.liste', {});
+    delete l[wahl];
+    S.schreiben('aa.' + k + '.liste', l);
+  }
+  await listeFuellen(k);
+  melden(k, 'Gelöscht');
+}
+
+async function neu(k){
+  const nr = await naechsteNr(k);
+  setzenFelder(k, STANDARD[k]);
+  if (k === 'o') $('datum').value = HEUTE;
+  $(NRFELD[k]).value = nr;
+  $(k + 'Liste').value = '';
+  zeichnen(k);
+  melden(k, 'Neues Dokument, Nr. ' + nr);
+}
+
+['o', 'v'].forEach(k => {
+  $(k + 'Sichern').addEventListener('click', () => sichern(k));
+  $(k + 'Laden').addEventListener('click', () => laden(k));
+  $(k + 'Loeschen').addEventListener('click', () => loeschen(k));
+  $(k + 'Neu').addEventListener('click', () => neu(k));
+});
+
+/* ===== Prüfung vor dem Drucken ===== */
+function warnungen(k){
+  const w = [];
+  if (k === 'o'){
+    if (!$('kName').value.trim()) w.push('Kundenname fehlt');
+    if (/(^|\s)Name(\s|$)/.test($('intro').value)) w.push('Im Anschreiben steht noch «Name»');
+    if (!$('marke').value.trim()) w.push('Marke / Typ fehlt');
+    if (num($('preis').value) <= 0) w.push('Fahrzeugpreis fehlt');
+  } else {
+    if (!$('vName').value.trim()) w.push('Name / Firma fehlt');
+    if (!$('vMarke').value.trim()) w.push('Marke / Typ fehlt');
+    if (!$('vVin').value.trim()) w.push('Chassis-Nr. fehlt');
+    if (num($('vPreis').value) <= 0) w.push('Verkaufspreis fehlt');
+    if ($('vArt').value.indexOf('Händler') >= 0 && !$('vUid').value.trim()) w.push('UID des Händlers fehlt');
+  }
+  return w;
+}
+
+function warnZeigen(k){
+  const box = $(k + 'Warn'), w = warnungen(k);
+  if (!w.length){ box.hidden = true; box.innerHTML = ''; return; }
+  box.hidden = false;
+  box.innerHTML = 'Vor dem Versenden prüfen:<ul>' + w.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+}
+
+function freigegeben(k){
+  const w = warnungen(k);
+  if (!w.length) return true;
+  return confirm('Bitte prüfen:\n\n• ' + w.join('\n• ') + '\n\nTrotzdem fortfahren?');
 }
 
 /* ===== Anschreiben ===== */
@@ -768,6 +1054,8 @@ function renderVertrag(){
   $('docV1').innerHTML = buildVertrag1();
   $('docV2').innerHTML = buildVertrag2();
   fitView('v');
+  warnZeigen('v');
+  autoSichern('v');
 }
 
 document.querySelectorAll('#view-vertrag input, #view-vertrag select, #view-vertrag textarea').forEach(el => {
@@ -825,6 +1113,7 @@ function calcRender(){
       '<div><span>Basis (EUR × ' + fx.toLocaleString('de-CH') + ')</span><span>' + chf(basis) + '</span></div>'
     + '<div><span>+ ' + pct.toLocaleString('de-CH') + '%</span><span>' + chf(auf) + '</span></div>'
     + '<div><span>+ Fixzuschlag</span><span>' + chf(fix) + '</span></div>';
+  autoSichern('r');
 }
 ['eur', 'fx', 'pct', 'fix'].forEach(id => $(id).addEventListener('input', calcRender));
 $('toggleAdv').addEventListener('click', () => {
@@ -861,12 +1150,30 @@ $('mwstLbl').addEventListener('click', () => { $('mwst').checked = !$('mwst').ch
 $('kwBothLbl').addEventListener('click', () => { $('kwBoth').checked = !$('kwBoth').checked; render(); });
 $('btnZoom-o').addEventListener('click', () => { Z.o = !Z.o; fitView('o'); });
 $('btnZoom-v').addEventListener('click', () => { Z.v = !Z.v; fitView('v'); });
-$('btnPrint').addEventListener('click', () => window.print());
-$('btnWord').addEventListener('click', () => aktiv === 'vertrag' ? wordVertrag() : downloadWord());
+$('btnPrint').addEventListener('click', () => {
+  if (freigegeben(aktiv === 'vertrag' ? 'v' : 'o')) window.print();
+});
+$('btnWord').addEventListener('click', () => {
+  const k = aktiv === 'vertrag' ? 'v' : 'o';
+  if (!freigegeben(k)) return;
+  if (k === 'v') wordVertrag(); else downloadWord();
+});
 window.addEventListener('resize', () => { fitView('o'); fitView('v'); });
 window.addEventListener('load', () => { fitView('o'); fitView('v'); });
 
-$('datum').value = new Date().toISOString().slice(0,10);
+const HEUTE = new Date().toISOString().slice(0,10);
+$('datum').value = HEUTE;
+const STANDARD = { o: lesenFelder('o'), v: lesenFelder('v') };
+
+['o', 'v', 'r'].forEach(k => {
+  const d = S.lesen('aa.' + k + '.jetzt', null);
+  if (d) setzenFelder(k, d);
+  if (k !== 'r') listeFuellen(k);
+});
+$('srvUrl').value = S.lesen('aa.url', '');
+if (SRV.aktiv()) srvMelden('Verbunden mit der gemeinsamen Ablage.');
+if (!$('datum').value) $('datum').value = HEUTE;
+
 render();
 calcRender();
 renderVertrag();
