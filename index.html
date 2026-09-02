@@ -326,6 +326,18 @@ Wir danken Ihnen für Ihr Interesse daran, bei uns ein Fahrzeug zu kaufen. Gerne
     </fieldset>
 
     <fieldset>
+      <legend>Eintauschfahrzeug</legend>
+      <div class="row"><label for="eMarke">Marke / Typ</label><input id="eMarke"></div>
+      <div class="pair">
+        <div class="row"><label for="eFarbe">Farbe</label><input id="eFarbe"></div>
+        <div class="row"><label for="eInverkehr">1. Inverkehr.</label><input id="eInverkehr"></div>
+      </div>
+      <div class="row"><label for="eKm">Kilometer</label><input id="eKm" inputmode="numeric"></div>
+      <div class="row"><label for="eVin">Chassis-Nr.</label><input id="eVin"></div>
+      <div class="row"><label for="eStamm">Stamm-Nr.</label><input id="eStamm"></div>
+    </fieldset>
+
+    <fieldset>
       <legend>Ausstattung</legend>
       <div class="block">
         <label for="ausstattung">Liste einfügen – Komma oder Zeilenumbruch trennt</label>
@@ -444,9 +456,22 @@ Wir danken Ihnen für Ihr Interesse daran, bei uns ein Fahrzeug zu kaufen. Gerne
     </fieldset>
 
     <fieldset>
+      <legend>Eintauschfahrzeug</legend>
+      <div class="row"><label for="veMarke">Marke / Typ</label><input id="veMarke"></div>
+      <div class="pair">
+        <div class="row"><label for="veFarbe">Farbe</label><input id="veFarbe"></div>
+        <div class="row"><label for="veInverkehr">1. Inverkehr.</label><input id="veInverkehr"></div>
+      </div>
+      <div class="row"><label for="veKm">Kilometer</label><input id="veKm" inputmode="numeric"></div>
+      <div class="row"><label for="veVin">Chassis-Nr.</label><input id="veVin"></div>
+      <div class="row"><label for="veStamm">Stamm-Nr.</label><input id="veStamm"></div>
+    </fieldset>
+
+    <fieldset>
       <legend>Kaufpreis</legend>
       <div class="row"><label for="vPreis">Verkaufspreis</label><input id="vPreis" inputmode="decimal"></div>
-      <div class="row"><label for="vUeber">Überführung</label><input id="vUeber" inputmode="decimal"></div>
+      <div class="row"><label for="vZubehoer">Extrazubehör</label><input id="vZubehoer" inputmode="decimal"></div>
+      <div class="row"><label for="vUeber">Bereitstellung</label><input id="vUeber" inputmode="decimal"></div>
       <div class="row"><label for="vEintausch">Eintausch −</label><input id="vEintausch" inputmode="decimal"></div>
       <div class="row"><label for="vMwst">MWST</label>
         <select id="vMwst">
@@ -734,6 +759,29 @@ function buildDoc(){
   if (ausst.length){
     out += '<div class="sec">AUSSTATTUNG</div>';
     out += '<div class="ausst">' + esc(ausst.join(', ')) + '</div>';
+  }
+
+  const ein = [];
+  const zuE = (k, v) => { if (v) ein.push([k, v]); };
+  zuE('Marke / Typ', g('eMarke'));
+  zuE('Farbe', g('eFarbe'));
+  zuE('1. Inverkehrsetzung', g('eInverkehr'));
+  zuE('Kilometerstand', g('eKm') ? int(num(g('eKm'))) + ' km' : '');
+  zuE('Chassis-Nr. (VIN)', g('eVin'));
+  zuE('Stamm-Nr.', g('eStamm'));
+  if (ein.length){
+    out += '<div class="sec">EINTAUSCHFAHRZEUG</div><table class="grid">';
+    for (let i = 0; i < ein.length; i += 2){
+      out += '<tr>'
+        + '<td class="k" style="width:3.7cm">' + esc(ein[i][0]) + '</td>'
+        + '<td class="v" style="width:4.8cm">' + esc(ein[i][1]) + '</td>'
+        + (ein[i+1]
+            ? '<td class="k" style="width:3.7cm">' + esc(ein[i+1][0]) + '</td>'
+              + '<td class="v" style="width:4.8cm">' + esc(ein[i+1][1]) + '</td>'
+            : '<td class="blank" colspan="2"></td>')
+        + '</tr>';
+    }
+    out += '</table>';
   }
 
   const preis = num(g('preis')), pausch = num(g('pauschale')), eint = num(g('eintausch'));
@@ -1110,10 +1158,12 @@ function vLeistung(){
 }
 
 function vPreise(){
-  const preis = num($('vPreis').value), ueber = num($('vUeber').value), eint = num($('vEintausch').value);
+  const preis = num($('vPreis').value), zub = num($('vZubehoer').value);
+  const ueber = num($('vUeber').value), eint = num($('vEintausch').value);
   const art = $('vMwst').value;
-  const mwst = art === 'exkl' ? (preis + ueber) * 0.081 : 0;
-  return { preis, ueber, eint, art, mwst, total: preis + ueber + mwst - eint };
+  const netto = preis + zub + ueber;
+  const mwst = art === 'exkl' ? netto * 0.081 : 0;
+  return { preis, zub, ueber, eint, art, mwst, total: netto + mwst - eint };
 }
 
 function vZahlungText(){
@@ -1156,11 +1206,35 @@ function buildVertrag1(){
     [['Unfallfrei', $('vUnfall').value], ['Zustand', $('vZustand').value]]
   ]);
 
+  const vein = [];
+  const zuV = (k, v) => { if (v) vein.push([k, v]); };
+  zuV('Marke / Typ', g('veMarke'));
+  zuV('Farbe', g('veFarbe'));
+  zuV('1. Inverkehrsetzung', g('veInverkehr'));
+  zuV('Kilometerstand', g('veKm') ? int(num(g('veKm'))) + ' km' : '');
+  zuV('Chassis-Nr. (VIN)', g('veVin'));
+  zuV('Stamm-Nr.', g('veStamm'));
+  if (vein.length){
+    out += '<div class="sec">EINTAUSCHFAHRZEUG</div><table class="grid">';
+    for (let i = 0; i < vein.length; i += 2){
+      out += '<tr>'
+        + '<td class="k" style="width:3.7cm">' + esc(vein[i][0]) + '</td>'
+        + '<td class="v" style="width:4.8cm">' + esc(vein[i][1]) + '</td>'
+        + (vein[i+1]
+            ? '<td class="k" style="width:3.7cm">' + esc(vein[i+1][0]) + '</td>'
+              + '<td class="v" style="width:4.8cm">' + esc(vein[i+1][1]) + '</td>'
+            : '<td class="blank" colspan="2"></td>')
+        + '</tr>';
+    }
+    out += '</table>';
+  }
+
   const P = vPreise();
   out += '<div class="sec">KAUFPREIS</div><table class="price">';
   out += '<tr><td style="width:12.1cm">Verkaufspreis' + (P.art === 'inkl' ? ' inkl. 8.1% MWST' : '')
        + '</td><td class="a" style="width:4.9cm">' + chf(P.preis) + '</td></tr>';
-  if (P.ueber) out += '<tr><td>Überführung / Bereitstellung</td><td class="a">' + chf(P.ueber) + '</td></tr>';
+  if (P.zub)   out += '<tr><td>Extrazubehör</td><td class="a">' + chf(P.zub) + '</td></tr>';
+  if (P.ueber) out += '<tr><td>Bereitstellung</td><td class="a">' + chf(P.ueber) + '</td></tr>';
   if (P.eint)  out += '<tr><td>Eintauschfahrzeug (Abzug)</td><td class="a">CHF – '
        + P.eint.toLocaleString('de-CH', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</td></tr>';
   if (P.art === 'exkl') out += '<tr><td>MWST 8.1 %</td><td class="a">' + chf(P.mwst) + '</td></tr>';
@@ -1224,7 +1298,9 @@ $('btnUebernehmen').addEventListener('click', () => {
   const paare = [['kName','vName'],['kStrasse','vStrasse'],['kOrt','vOrt'],['marke','vMarke'],
     ['farbe','vFarbe'],['inverkehr','vInverkehr'],['km','vKm'],['kw','vKw'],['kwUnit','vKwUnit'],
     ['hubraum','vHubraum'],['mfk','vMfk'],['unfall','vUnfall'],['schluessel','vSchluessel'],
-    ['preis','vPreis'],['pauschale','vUeber'],['eintausch','vEintausch'],['nr','vNr']];
+    ['preis','vPreis'],['pauschale','vUeber'],['eintausch','vEintausch'],['nr','vNr'],
+    ['eMarke','veMarke'],['eFarbe','veFarbe'],['eInverkehr','veInverkehr'],
+    ['eKm','veKm'],['eVin','veVin'],['eStamm','veStamm']];
   paare.forEach(([a, b]) => { if ($(a).value) $(b).value = $(a).value; });
   $('vKwBoth').checked = $('kwBoth').checked;
   renderVertrag();
@@ -1396,7 +1472,9 @@ document.querySelectorAll('#view-rechnung input, #view-rechnung select, #view-re
 $('btnAusVertrag').addEventListener('click', () => {
   const paare = [['vName','fName'],['vStrasse','fStrasse'],['vOrt','fOrt'],['vMarke','fMarke'],
     ['vVin','fVin'],['vInverkehr','fInverkehr'],['vPreis','fPreis'],
-    ['vUeber','fUeber'],['vEintausch','fEintausch'],['vMwst','fMwst'],['vBank','fBank'],['vNr','fVertragNr']];
+    ['vUeber','fUeber'],['vEintausch','fEintausch'],['vMwst','fMwst'],['vBank','fBank'],['vNr','fVertragNr'],
+    ['vZubehoer','fPosBetrag']];
+  if ($('vZubehoer').value && !$('fPosText').value) $('fPosText').value = 'Extrazubehör';
   paare.forEach(([a, b]) => { if ($(a).value) $(b).value = $(a).value; });
   renderRechnung();
 });
