@@ -43,8 +43,13 @@
 .kachel:hover{border-color:var(--akzent);border-left-color:var(--akzent)}
 .kachel .kt{display:block;font-size:15px;font-weight:600;color:var(--ink);margin-bottom:5px}
 .kachel .kd{display:block;font-size:12.5px;line-height:1.45;color:var(--muted)}
-.startfuss{margin-top:26px;padding-top:12px;border-top:1px solid var(--hair);
-  font-size:12px;color:var(--muted)}
+.status{margin-top:28px;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;padding:15px 17px;border:1px solid var(--hair);
+  border-left:3px solid var(--hair);background:var(--paper)}
+.status.offen{background:var(--field);border-left-color:var(--akzent)}
+.status .stitel{font-size:14.5px;font-weight:600;color:var(--ink)}
+.status .stext{font-size:12.5px;line-height:1.45;color:var(--muted);margin-top:3px}
+.status button{font-size:13px;padding:10px 18px;white-space:nowrap}
 
 /* ---------- Rechner ---------- */
 .calcwrap{display:flex;justify-content:center;padding:34px 22px 40px}
@@ -158,16 +163,30 @@ DOC_STYLE_PLACEHOLDER
   .pair .row label{flex:0 0 128px}
 }
 @media print{
-  html,body{background:#fff;overflow:visible}
+  /* Die Seitenränder kommen aus @page, nicht mehr aus dem Blatt selbst.
+     Das Blatt füllt die druckbare Fläche, dadurch wird nichts abgeschnitten. */
+  @page{size:A4;margin:18mm 20mm 16mm 20mm}
+
+  html,body{background:#fff;overflow:visible;margin:0;padding:0}
   .panel,.bar,.stagehead,.topbar,#view-rechner,#view-start{display:none!important}
   .app,.stage{display:block;padding:0;margin:0}
   .sheetbox{overflow:visible;width:auto!important;height:auto!important;margin:0}
   .sheetwrap{transform:none!important;width:auto!important}
-  .sheet{width:21cm;height:29.7cm;min-height:0;box-shadow:none;margin:0;
-    padding:1.8cm 2cm 1.6cm;page-break-after:always}
-  .sheet:last-child{page-break-after:auto}
-  .sheetfoot{position:absolute;bottom:1.1cm}
-  @page{size:A4;margin:0}
+  .sheet{width:auto;height:26.2cm;min-height:0;box-shadow:none;margin:0;padding:0;position:relative}
+  .sheet + .sheet{break-before:page;page-break-before:always}
+  .sheetfoot{position:absolute;left:0;right:0;bottom:0}
+
+  /* Breiten relativ statt in Zentimetern, damit sie sich der Druckfläche anpassen */
+  .doc table{width:100%!important}
+  .doc td[style*="10.6cm"]{width:62.4%!important}
+  .doc td[style*="6.4cm"]{width:37.6%!important}
+  .doc td[style*="10.5cm"]{width:61.8%!important}
+  .doc td[style*="6.5cm"]{width:38.2%!important}
+  .doc td[style*="3.7cm"]{width:21.8%!important}
+  .doc td[style*="4.8cm"]{width:28.2%!important}
+  .doc td[style*="12.1cm"]{width:71.2%!important}
+  .doc td[style*="4.9cm"]{width:28.8%!important}
+  .doc td[style*="8.5cm"]{width:50%!important}
 }
 </style>
 </head>
@@ -202,7 +221,23 @@ DOC_STYLE_PLACEHOLDER
         <span class="kd">Für Fahrzeugverkauf oder für eine Überführung</span>
       </button>
     </div>
-    <div class="startfuss" id="startStatus"></div>
+    <div class="status" id="startStatus"></div>
+
+    <div id="ablageBox" hidden>
+      <fieldset style="margin-top:18px">
+        <legend>Gemeinsame Ablage</legend>
+        <div class="block">
+          <label for="srvUrl">Adresse der Google-Tabelle</label>
+          <textarea id="srvUrl" rows="2" placeholder="https://script.google.com/macros/s/…/exec"></textarea>
+        </div>
+        <div class="ablagebtns">
+          <button class="linkbtn" id="srvPruefen">Verbindung prüfen</button>
+          <button class="linkbtn" id="srvLink">Einrichtungslink kopieren</button>
+          <button class="linkbtn" id="srvTrennen">Trennen</button>
+        </div>
+        <div class="hinweis" id="srvHinweis">Ohne Adresse wird nur auf diesem Gerät gespeichert.</div>
+      </fieldset>
+    </div>
   </div>
 </section>
 
@@ -229,18 +264,6 @@ DOC_STYLE_PLACEHOLDER
         <div class="calcbreak" id="calcBreak"></div>
       </div>
 
-      <fieldset style="margin-top:26px">
-        <legend>Gemeinsame Ablage</legend>
-        <div class="block">
-          <label for="srvUrl">Adresse der Google-Tabelle</label>
-          <textarea id="srvUrl" rows="2" placeholder="https://script.google.com/macros/s/…/exec"></textarea>
-        </div>
-        <div class="ablagebtns">
-          <button class="linkbtn" id="srvPruefen">Verbindung prüfen</button>
-          <button class="linkbtn" id="srvTrennen">Trennen</button>
-        </div>
-        <div class="hinweis" id="srvHinweis">Ohne Adresse wird nur auf diesem Gerät gespeichert.</div>
-      </fieldset>
     </div>
   </div>
 </section>
@@ -445,6 +468,10 @@ Wir danken Ihnen für Ihr Interesse daran, bei uns ein Fahrzeug zu kaufen. Gerne
         <div class="row"><label for="vSchluessel">Schlüssel</label><input id="vSchluessel" inputmode="numeric"></div>
       </div>
       <div class="pair">
+        <div class="row"><label for="vGarantie">Garantie Monate</label><input id="vGarantie" inputmode="numeric" placeholder="24"></div>
+        <div class="row"><label for="vGarantieKm">Garantie km</label><input id="vGarantieKm" inputmode="numeric" placeholder="100000"></div>
+      </div>
+      <div class="pair">
         <div class="row"><label for="vUnfall">Unfallfrei</label>
           <select id="vUnfall"><option value="">nicht angeben</option><option value="ja" selected>ja</option><option value="nein">nein</option></select>
         </div>
@@ -641,7 +668,7 @@ const DOC_CSS = `
 .doc .rt{text-align:right}
 .doc .rule{border-bottom:1.25pt solid #000000;height:5pt}
 .doc .tiny{font-size:7.5pt;color:#5F5F5F;padding-bottom:2pt}
-.doc .addr td{padding-top:16pt}
+.doc .addr td{padding-top:46pt}
 .doc .datum td{padding-top:34pt;font-size:11pt;color:#5F5F5F}
 .doc .title{font-size:16pt;font-weight:bold;margin:20pt 0 7pt}
 .doc .intro{font-size:11pt;margin:0 0 4pt}
@@ -699,11 +726,10 @@ function buildDoc(){
       + '</td></tr></table>';
   out += '<table><tr><td class="rule"></td></tr></table>';
 
-  out += '<table class="addr"><tr><td style="width:12.5cm"></td><td style="width:4.5cm">'
-      + '<div class="tiny">Kunde</div>'
+  out += '<table class="addr"><tr><td style="width:10.5cm"></td><td style="width:6.5cm">'
       + (kunde.length ? kunde.map(l => '<div>' + esc(l) + '</div>').join('') : '<div>&nbsp;</div>')
       + '</td></tr></table>';
-  out += '<table class="datum"><tr><td style="width:12.5cm"></td><td style="width:4.5cm">'
+  out += '<table class="datum"><tr><td style="width:10.5cm"></td><td style="width:6.5cm">'
       + esc(dateDE(g('datum'))) + '</td></tr></table>';
 
   out += '<div class="title">Offerte Fahrzeugverkauf</div>';
@@ -914,6 +940,36 @@ const NRFELD = { o: 'nr', v: 'vNr', f: 'fNr' };
 
 function srvMelden(text){ $('srvHinweis').textContent = text; }
 
+/* Die Adresse darf im Link stehen bleiben: dann überlebt die Verbindung
+   jedes Löschen des Browserspeichers, weil sie Teil der App-Adresse ist. */
+(function ausLink(){
+  const m = String(location.hash || '').match(/^#ablage=(.+)$/);
+  if (!m) return;
+  try {
+    const u = decodeURIComponent(m[1]);
+    if (/^https:\/\//.test(u)) S.schreiben('aa.url', u);
+  } catch(e){}
+})();
+
+/* Browser bitten, den Speicher nicht selbst zu leeren */
+if (navigator.storage && navigator.storage.persist) {
+  navigator.storage.persist().catch(() => {});
+}
+
+$('srvLink').addEventListener('click', async () => {
+  const u = $('srvUrl').value.trim();
+  if (!u) return srvMelden('Zuerst die Adresse einsetzen');
+  const link = location.origin + location.pathname + '#ablage=' + encodeURIComponent(u);
+  try {
+    await navigator.clipboard.writeText(link);
+    srvMelden('Link kopiert. Auf jedem Gerät öffnen und von dort aus zum Startbildschirm hinzufügen – '
+      + 'dann bleibt die Verbindung dauerhaft bestehen.');
+  } catch(e){
+    $('srvUrl').value = link;
+    srvMelden('Kopieren ging nicht – der Link steht jetzt im Feld oben, von dort kopieren.');
+  }
+});
+
 $('srvPruefen').addEventListener('click', async () => {
   const u = $('srvUrl').value.trim();
   if (!u) return srvMelden('Bitte zuerst die Adresse einsetzen');
@@ -1115,7 +1171,7 @@ const AGB_ALLE = [
   ['2.', 'Gewährleistung', [
     'Der Verkäufer schliesst jegliche Gewähr für Sachmängel aus, soweit gesetzlich zulässig. Der Ausschluss gilt nicht für arglistig verschwiegene Mängel (Art. 199 OR) und nicht für schriftliche Zusicherungen in diesem Vertrag.']],
   ['3.', 'Garantie und MFK', [
-    '\u2610 Keine Werksgarantie.\u2003\u2610 Werksgarantie bis __________________ oder __________ km, was zuerst eintritt. Sie wird allein vom Hersteller erbracht.',
+    'Eine allfällige Werksgarantie ist auf Seite 1 unter «Garantie» angegeben; sind Monate und Kilometer aufgeführt, gilt, was zuerst eintritt. Sie wird allein vom Hersteller oder Garantiegeber erbracht; der Verkäufer haftet nicht für deren Bestand oder Umfang. Ist dort nichts eingetragen, besteht keine Werksgarantie.',
     'Wird das Fahrzeug ohne MFK verkauft, gehen Vorführung und dafür nötige Arbeiten zulasten des Käufers.']],
   ['4.', 'Eigentumsvorbehalt', [
     'Das Fahrzeug bleibt bis zur vollständigen Bezahlung Eigentum des Verkäufers. Der Verkäufer kann einen Eigentumsvorbehalt nach Art. 715 ZGB eintragen lassen; der Käufer liefert die dafür nötigen Angaben.']],
@@ -1157,6 +1213,13 @@ function vLeistung(){
   return $('vKwBoth').checked ? int(kw) + ' kW / ' + int(ps) + ' PS' : int(wert) + ' ' + einheit;
 }
 
+function garantieText(){
+  const mon = $('vGarantie').value.trim(), km = $('vGarantieKm').value.trim();
+  const a = mon ? int(num(mon)) + ' Monate' : '';
+  const b = km ? int(num(km)) + ' km' : '';
+  return a && b ? a + ' oder ' + b : (a || b);
+}
+
 function vPreise(){
   const preis = num($('vPreis').value), zub = num($('vZubehoer').value);
   const ueber = num($('vUeber').value), eint = num($('vEintausch').value);
@@ -1182,7 +1245,7 @@ function buildVertrag1(){
       + '<td style="width:10.6cm"><div class="firm">Allegra Auto GmbH</div></td>'
       + '<td style="width:6.4cm" class="rt">'
       + '<div class="meta">Kaufvertrag Nr. ' + (nr ? esc(nr) : '__________') + '</div>'
-      + '<div class="meta">UID &nbsp;CHE-320.630.565</div>'
+      + '<div class="meta">MWST-Nr. &nbsp;CHE-320.630.565 MWST</div>'
       + '</td></tr></table>';
   out += '<table><tr><td class="rule"></td></tr></table>';
   out += '<div class="title">Kaufvertrag Fahrzeug</div>';
@@ -1203,7 +1266,8 @@ function buildVertrag1(){
     [['1. Inverkehrsetzung', g('vInverkehr')], ['Kilometerstand', g('vKm') ? int(num(g('vKm'))) + ' km' : '']],
     [['Leistung', vLeistung()], ['Hubraum', g('vHubraum') ? String(Math.round(num(g('vHubraum')))) + ' cm³' : '']],
     [['Letzte MFK', g('vMfk')], ['Anzahl Schlüssel', g('vSchluessel')]],
-    [['Unfallfrei', $('vUnfall').value], ['Zustand', $('vZustand').value]]
+    [['Unfallfrei', $('vUnfall').value], ['Garantie', garantieText()]],
+    [['Zustand', $('vZustand').value]]
   ]);
 
   const vein = [];
@@ -1355,15 +1419,14 @@ function buildRechnung(){
       + '<td style="width:10.6cm"><div class="firm">Allegra Auto GmbH</div></td>'
       + '<td style="width:6.4cm" class="rt">'
       + '<div class="meta">Rechnung Nr. ' + (nr ? esc(nr) : '__________') + '</div>'
-      + '<div class="meta">UID &nbsp;CHE-320.630.565</div>'
+      + '<div class="meta">MWST-Nr. &nbsp;CHE-320.630.565 MWST</div>'
       + '</td></tr></table>';
   out += '<table><tr><td class="rule"></td></tr></table>';
 
-  out += '<table class="addr"><tr><td style="width:12.5cm"></td><td style="width:4.5cm">'
-      + '<div class="tiny">Kunde</div>'
+  out += '<table class="addr"><tr><td style="width:10.5cm"></td><td style="width:6.5cm">'
       + (kunde.length ? kunde.map(l => '<div>' + esc(l) + '</div>').join('') : '<div>&nbsp;</div>')
       + '</td></tr></table>';
-  out += '<table class="datum"><tr><td style="width:12.5cm"></td><td style="width:4.5cm">'
+  out += '<table class="datum"><tr><td style="width:10.5cm"></td><td style="width:6.5cm">'
       + esc(dateDE(g('fDatum'))) + '</td></tr></table>';
 
   out += '<div class="title">Rechnung</div>';
@@ -1537,9 +1600,22 @@ function showView(name){
   $('btnZurueck').hidden = start;
   $('topTrenner').hidden = start;
   $('topTitel').textContent = start ? '' : (TITEL[name] || '');
-  if (start) $('startStatus').textContent = SRV.aktiv()
-    ? 'Gemeinsame Ablage verbunden.'
-    : 'Ohne gemeinsame Ablage – es wird nur auf diesem Gerät gespeichert.';
+  if (start){
+    const verbunden = SRV.aktiv();
+    const box = $('startStatus');
+    box.className = 'status' + (verbunden ? '' : ' offen');
+    box.innerHTML = '<div>'
+      + '<div class="stitel">' + (verbunden ? 'Gemeinsame Ablage verbunden' : 'Keine gemeinsame Ablage') + '</div>'
+      + '<div class="stext">' + (verbunden
+          ? 'Offerten, Verträge und Rechnungen liegen in der Google-Tabelle und sind auf allen Geräten sichtbar.'
+          : 'Es wird nur auf diesem Gerät gespeichert. Andere Geräte sehen davon nichts.')
+      + '</div></div>'
+      + '<button class="' + (verbunden ? 'ghost' : 'primary') + '" id="btnAblage">'
+      + (verbunden ? 'Ändern' : 'Einrichten') + '</button>';
+    $('btnAblage').addEventListener('click', () => {
+      $('ablageBox').hidden = !$('ablageBox').hidden;
+    });
+  }
   if (SCHLUESSEL[name]) fitView(SCHLUESSEL[name]);
   window.scrollTo(0, 0);
 }
