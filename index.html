@@ -123,7 +123,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .sheetbox{overflow-x:hidden;overflow-y:hidden;margin:0 auto}
 .sheetwrap{transform-origin:top left;width:794px}
 .sheet{width:21cm;min-height:29.7cm;background:var(--paper);
-  padding:1.8cm 2cm 1.6cm;box-shadow:0 2px 20px rgba(0,0,0,.14);position:relative}
+  padding:1.8cm 2cm 2.7cm;box-shadow:0 2px 20px rgba(0,0,0,.14);position:relative}
 .sheet + .sheet{margin-top:22px}
 .linkrow{padding:0 0 14px}
 .ablage{margin:0 0 18px}
@@ -165,16 +165,20 @@ DOC_STYLE_PLACEHOLDER
 @media print{
   /* Die Seitenränder kommen aus @page, nicht mehr aus dem Blatt selbst.
      Das Blatt füllt die druckbare Fläche, dadurch wird nichts abgeschnitten. */
-  @page{size:A4;margin:18mm 20mm 16mm 20mm}
+  @page{size:A4;margin:16mm 20mm 14mm 20mm}
 
   html,body{background:#fff;overflow:visible;margin:0;padding:0}
   .panel,.bar,.stagehead,.topbar,#view-rechner,#view-start{display:none!important}
   .app,.stage{display:block;padding:0;margin:0}
   .sheetbox{overflow:visible;width:auto!important;height:auto!important;margin:0}
   .sheetwrap{transform:none!important;width:auto!important}
-  .sheet{width:auto;height:26.2cm;min-height:0;box-shadow:none;margin:0;padding:0;position:relative}
+  /* Keine feste Höhe: der Inhalt bestimmt sie, die Fusszeile wird nach unten gedrückt.
+     Dadurch kann kein Blatt mehr um wenige Millimeter überlaufen. */
+  .sheet{width:auto;height:auto;min-height:24cm;box-shadow:none;margin:0;padding:0;
+    display:flex;flex-direction:column;overflow:visible}
   .sheet + .sheet{break-before:page;page-break-before:always}
-  .sheetfoot{position:absolute;left:0;right:0;bottom:0}
+  .sheet .doc{flex:0 0 auto;margin-bottom:9mm}
+  .sheetfoot{position:static;left:auto;right:auto;bottom:auto;margin-top:auto;padding-top:8pt}
 
   /* Breiten relativ statt in Zentimetern, damit sie sich der Druckfläche anpassen */
   .doc table{width:100%!important}
@@ -1257,14 +1261,14 @@ function buildVertrag1(){
   out += '<table><tr><td class="rule"></td></tr></table>';
   out += '<div class="title">Kaufvertrag Fahrzeug</div>';
 
-  out += '<div class="sec">KÄUFER</div>';
-  out += gitter([
-    [['Käufer ist', $('vArt').value]],
+  const kaeuferZeilen = [
     [['Name / Firma', g('vName')], ['Vorname / Kontakt', g('vVorname')]],
     [['Strasse Nr.', g('vStrasse')], ['PLZ / Ort', g('vOrt')]],
-    [['Telefon', g('vTel')], ['E-Mail', g('vMail')]],
-    [['UID / MWST-Nr.', g('vUid')]]
-  ]);
+    [['Telefon', g('vTel')], ['E-Mail', g('vMail')]]
+  ];
+  if (g('vUid')) kaeuferZeilen.push([['UID / MWST-Nr.', g('vUid')]]);
+  out += '<div class="sec">KÄUFER</div>';
+  out += gitter(kaeuferZeilen);
 
   out += '<div class="sec">FAHRZEUG</div>';
   out += gitter([
@@ -1319,17 +1323,11 @@ function buildVertrag1(){
     [['Übergabe', 'Datum ' + (g('vUeDatum') || '__________________') + '\u2003 Ort ' + (g('vUeOrt') || '__________________')]]
   ]);
 
-  out += '<div class="sec">BEMERKUNGEN</div>';
   const bem = g('vBem');
   if (bem){
+    out += '<div class="sec">BEMERKUNGEN</div>';
     bem.split('\n').forEach(l => { if (l.trim()) out += '<div class="cltxt">' + esc(l) + '</div>'; });
-  } else {
-    out += '<div class="lines">________________________________________________________________________________________</div>';
-    out += '<div class="lines">________________________________________________________________________________________</div>';
   }
-
-  out += '<div class="hint">Die Vertragsbestimmungen auf Seite 2 sind Teil dieses Vertrages. Der Käufer bestätigt mit seiner '
-       + 'Unterschrift, das Fahrzeug besichtigt zu haben und mit den Bestimmungen einverstanden zu sein.</div>';
 
   out += '<table class="sig"><tr>'
       + '<td style="width:8.5cm"><div>Ort / Datum:&nbsp; ____________________________</div>'
