@@ -471,6 +471,7 @@ Wir danken Ihnen für Ihr Interesse daran, bei uns ein Fahrzeug zu kaufen. Gerne
         <div class="row"><label for="vGarantie">Garantie Monate</label><input id="vGarantie" inputmode="numeric" placeholder="24"></div>
         <div class="row"><label for="vGarantieKm">Garantie km</label><input id="vGarantieKm" inputmode="numeric" placeholder="100000"></div>
       </div>
+      <div class="check"><input type="checkbox" id="vGarantieAb"><span id="vGarantieAbLbl">Garantie zählt ab 1. Inverkehrsetzung</span></div>
       <div class="pair">
         <div class="row"><label for="vUnfall">Unfallfrei</label>
           <select id="vUnfall"><option value="">nicht angeben</option><option value="ja" selected>ja</option><option value="nein">nein</option></select>
@@ -1171,7 +1172,7 @@ const AGB_ALLE = [
   ['2.', 'Gewährleistung', [
     'Der Verkäufer schliesst jegliche Gewähr für Sachmängel aus, soweit gesetzlich zulässig. Der Ausschluss gilt nicht für arglistig verschwiegene Mängel (Art. 199 OR) und nicht für schriftliche Zusicherungen in diesem Vertrag.']],
   ['3.', 'Garantie und MFK', [
-    'Eine allfällige Werksgarantie ist auf Seite 1 unter «Garantie» angegeben; sind Monate und Kilometer aufgeführt, gilt, was zuerst eintritt. Sie wird allein vom Hersteller oder Garantiegeber erbracht; der Verkäufer haftet nicht für deren Bestand oder Umfang. Ist dort nichts eingetragen, besteht keine Werksgarantie.',
+    'Eine allfällige Werksgarantie ist auf Seite 1 unter «Garantie» angegeben; sind Monate und Kilometer aufgeführt, gilt, was zuerst eintritt. Ist dort «ab Inverkehrsetzung» vermerkt, läuft die Frist ab der ersten Inverkehrsetzung, sonst ab der Übergabe. Sie wird allein vom Hersteller oder Garantiegeber erbracht; der Verkäufer haftet nicht für deren Bestand oder Umfang. Ist nichts eingetragen, besteht keine Werksgarantie.',
     'Wird das Fahrzeug ohne MFK verkauft, gehen Vorführung und dafür nötige Arbeiten zulasten des Käufers.']],
   ['4.', 'Eigentumsvorbehalt', [
     'Das Fahrzeug bleibt bis zur vollständigen Bezahlung Eigentum des Verkäufers. Der Verkäufer kann einen Eigentumsvorbehalt nach Art. 715 ZGB eintragen lassen; der Käufer liefert die dafür nötigen Angaben.']],
@@ -1217,7 +1218,9 @@ function garantieText(){
   const mon = $('vGarantie').value.trim(), km = $('vGarantieKm').value.trim();
   const a = mon ? int(num(mon)) + ' Monate' : '';
   const b = km ? int(num(km)) + ' km' : '';
-  return a && b ? a + ' oder ' + b : (a || b);
+  const kern = a && b ? a + ' oder ' + b : (a || b);
+  if (!kern) return '';
+  return kern + ($('vGarantieAb').checked ? ' ab Inverkehrsetzung' : '');
 }
 
 function vPreise(){
@@ -1245,7 +1248,7 @@ function buildVertrag1(){
       + '<td style="width:10.6cm"><div class="firm">Allegra Auto GmbH</div></td>'
       + '<td style="width:6.4cm" class="rt">'
       + '<div class="meta">Kaufvertrag Nr. ' + (nr ? esc(nr) : '__________') + '</div>'
-      + '<div class="meta">MWST-Nr. &nbsp;CHE-320.630.565 MWST</div>'
+      + '<div class="meta">CHE-320.630.565 MWST</div>'
       + '</td></tr></table>';
   out += '<table><tr><td class="rule"></td></tr></table>';
   out += '<div class="title">Kaufvertrag Fahrzeug</div>';
@@ -1356,6 +1359,7 @@ document.querySelectorAll('#view-vertrag input, #view-vertrag select, #view-vert
   el.addEventListener('change', renderVertrag);
 });
 $('vKwBothLbl').addEventListener('click', () => { $('vKwBoth').checked = !$('vKwBoth').checked; renderVertrag(); });
+$('vGarantieAbLbl').addEventListener('click', () => { $('vGarantieAb').checked = !$('vGarantieAb').checked; renderVertrag(); });
 
 /* Daten aus der Offerte holen */
 $('btnUebernehmen').addEventListener('click', () => {
@@ -1419,7 +1423,7 @@ function buildRechnung(){
       + '<td style="width:10.6cm"><div class="firm">Allegra Auto GmbH</div></td>'
       + '<td style="width:6.4cm" class="rt">'
       + '<div class="meta">Rechnung Nr. ' + (nr ? esc(nr) : '__________') + '</div>'
-      + '<div class="meta">MWST-Nr. &nbsp;CHE-320.630.565 MWST</div>'
+      + '<div class="meta">CHE-320.630.565 MWST</div>'
       + '</td></tr></table>';
   out += '<table><tr><td class="rule"></td></tr></table>';
 
