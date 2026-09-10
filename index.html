@@ -167,14 +167,16 @@ DOC_STYLE_PLACEHOLDER
      Das Blatt füllt die druckbare Fläche, dadurch wird nichts abgeschnitten. */
   @page{size:A4;margin:16mm 20mm 14mm 20mm}
 
-  html,body{background:#fff;overflow:visible;margin:0;padding:0}
+  /* Feste Breite in Zentimetern: sonst rechnet Safari auf dem iPhone
+     die Bildschirmbreite auf das Papier hoch und alles wird grösser. */
+  html,body{background:#fff;overflow:visible;margin:0;padding:0;width:17cm}
   .panel,.bar,.stagehead,.topbar,#view-rechner,#view-start{display:none!important}
   .app,.stage{display:block;padding:0;margin:0}
-  .sheetbox{overflow:visible;width:auto!important;height:auto!important;margin:0}
-  .sheetwrap{transform:none!important;width:auto!important}
+  .sheetbox{overflow:visible;width:17cm!important;height:auto!important;margin:0}
+  .sheetwrap{transform:none!important;width:17cm!important}
   /* Keine feste Höhe: der Inhalt bestimmt sie, die Fusszeile wird nach unten gedrückt.
      Dadurch kann kein Blatt mehr um wenige Millimeter überlaufen. */
-  .sheet{width:auto;height:26.3cm;min-height:0;box-shadow:none;margin:0;padding:0;
+  .sheet{width:17cm;height:26.3cm;min-height:0;box-shadow:none;margin:0;padding:0;
     display:flex;flex-direction:column;overflow:visible}
   .sheet + .sheet{break-before:page;page-break-before:always}
   .sheet .doc{flex:0 0 auto;margin-bottom:9mm}
