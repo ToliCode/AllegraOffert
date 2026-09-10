@@ -172,15 +172,19 @@ DOC_STYLE_PLACEHOLDER
   html,body{background:#fff;overflow:visible;margin:0;padding:0;width:17cm}
   .panel,.bar,.stagehead,.topbar,#view-rechner,#view-start{display:none!important}
   .app,.stage{display:block;padding:0;margin:0}
-  .sheetbox{overflow:visible;width:17cm!important;height:auto!important;margin:0}
-  .sheetwrap{transform:none!important;width:17cm!important}
+  .sheetbox{overflow:visible!important;overflow-x:visible!important;overflow-y:visible!important;
+    width:17cm!important;height:auto!important;margin:0}
+  .sheetwrap{transform:none!important;width:17cm!important;overflow:visible!important}
   /* Keine feste Höhe: der Inhalt bestimmt sie, die Fusszeile wird nach unten gedrückt.
      Dadurch kann kein Blatt mehr um wenige Millimeter überlaufen. */
   .sheet{width:17cm;height:26.3cm;min-height:0;box-shadow:none;margin:0;padding:0;
     display:flex;flex-direction:column;overflow:visible}
   .sheet + .sheet{break-before:page;page-break-before:always}
   .sheet .doc{flex:0 0 auto;margin-bottom:9mm}
-  .sheetfoot{position:static;left:auto;right:auto;bottom:auto;margin-top:auto;padding-top:8pt}
+  /* Fusszeile an den unteren Seitenrand heften statt ans Blattende */
+  .sheetfoot{position:fixed;left:0;right:auto;bottom:0;width:17cm;
+    margin:0;padding-top:6pt;background:#fff}
+  .sheet + .sheet .sheetfoot{display:none}
 
   /* Breiten relativ statt in Zentimetern, damit sie sich der Druckfläche anpassen */
   .doc table{width:100%!important}
